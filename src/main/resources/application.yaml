@@ -1,3 +1,23 @@
 spring:
   application:
     name: gymflow
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gymflow
+    username: ${ENV_POSTGRES_USER}
+    password: ${ENV_POSTGRES_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO

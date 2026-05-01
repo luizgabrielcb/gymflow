@@ -18,6 +18,7 @@ import java.util.Collection;
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include

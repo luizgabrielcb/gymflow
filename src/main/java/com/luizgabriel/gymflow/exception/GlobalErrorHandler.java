@@ -29,4 +29,14 @@ public class GlobalErrorHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);
     }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<DefaultErrorMessage> handleNotFoundException(NotFoundException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getMessage())
+                .status(e.getStatusCode().value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(defaultErrorMessage);
+    }
 }

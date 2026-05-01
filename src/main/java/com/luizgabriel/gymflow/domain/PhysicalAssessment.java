@@ -1,10 +1,7 @@
 package com.luizgabriel.gymflow.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -16,10 +13,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PhysicalAssessment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
     @Column(nullable = false)
     private BigDecimal weight;

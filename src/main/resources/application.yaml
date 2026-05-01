@@ -21,3 +21,6 @@ server:
 logging:
   level:
     root: INFO
+
+jwt:
+  secret: ${ENV_JWT_SECRET:"gymflow-secret-key"}

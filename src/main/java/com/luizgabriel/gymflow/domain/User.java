@@ -8,7 +8,9 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Table(name = "users")
 @Entity
@@ -24,17 +26,28 @@ public class User implements UserDetails {
     @EqualsAndHashCode.Include
     @Column(nullable = false)
     private Long id;
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
     @CreationTimestamp
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<Workout> workouts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<PhysicalAssessment> assessments = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -2,38 +2,33 @@ package com.luizgabriel.gymflow.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+import java.util.List;
 
-@Table(name = "physical_assessments")
+@Table(name = "workouts")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PhysicalAssessment {
+public class Workout {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(nullable = false)
-    private BigDecimal weight;
+    @Column(nullable = false, unique = true)
+    private String name;
 
     @Column(nullable = false)
-    private BigDecimal height;
-
-    @Column(nullable = false)
-    private BigDecimal fatPercentage;
+    private String muscleGroups;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @CreationTimestamp
-    private Instant createdAt;
+    @OneToMany(mappedBy = "workout",  cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkoutExercise> workoutExercises;
 }

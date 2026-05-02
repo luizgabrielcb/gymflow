@@ -3,7 +3,7 @@ package com.luizgabriel.gymflow.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "workouts")
+@Table(name = "workout_exercise")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

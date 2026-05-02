@@ -32,8 +32,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/v1/users/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "v1/physical-assessments/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "v1/physical-assessments").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -1,13 +1,14 @@
 package com.luizgabriel.gymflow.controller;
 
+import com.luizgabriel.gymflow.domain.User;
+import com.luizgabriel.gymflow.dto.request.UserPutRequest;
 import com.luizgabriel.gymflow.dto.response.UserGetResponse;
 import com.luizgabriel.gymflow.mapper.UserMapper;
 import com.luizgabriel.gymflow.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,10 +22,46 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserGetResponse>> findAllUsers() {
+
         var userList = service.findAll();
 
         var userGetResponseList = mapper.toUserGetResponseList(userList);
 
         return ResponseEntity.ok(userGetResponseList);
     }
+
+    @GetMapping
+    public ResponseEntity<UserGetResponse> findMe(@AuthenticationPrincipal User user) {
+
+        var myUser = service.findById(user.getId());
+
+        var userGetResponse = mapper.toUserGetResponse(myUser);
+
+        return ResponseEntity.ok(userGetResponse);
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> update(@RequestParam UserPutRequest request, @AuthenticationPrincipal User user) {
+
+        service.update(user, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+
+        service.delete(id);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("me")
+    public ResponseEntity<Void> deleteMe(@AuthenticationPrincipal User user) {
+
+        service.delete(user.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
 }

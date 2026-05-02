@@ -22,18 +22,18 @@ public class AuthController {
     private final AuthService authService;
     private final AuthFacade authFacade;
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
-        var token = authFacade.login(request);
-
-        return ResponseEntity.ok(token);
-    }
-
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody @Valid UserPostRequest request) {
         authService.register(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+        var token = authFacade.login(request);
+
+        return ResponseEntity.ok(token);
     }
 }
 

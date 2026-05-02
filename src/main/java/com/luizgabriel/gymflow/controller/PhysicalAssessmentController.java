@@ -2,6 +2,7 @@ package com.luizgabriel.gymflow.controller;
 
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.dto.request.PhysicalAssessmentPostRequest;
+import com.luizgabriel.gymflow.dto.request.PhysicalAssessmentPutRequest;
 import com.luizgabriel.gymflow.dto.response.PhysicalAssessmentGetResponse;
 import com.luizgabriel.gymflow.dto.response.PhysicalAssessmentPostResponse;
 import com.luizgabriel.gymflow.mapper.PhysicalAssessmentMapper;
@@ -24,9 +25,8 @@ public class PhysicalAssessmentController {
     private final PhysicalAssessmentMapper mapper;
 
     @PostMapping
-    public ResponseEntity<PhysicalAssessmentPostResponse> save(@RequestBody @Valid PhysicalAssessmentPostRequest request,
-                                                               @AuthenticationPrincipal User user) {
-        var savedAssessment = service.save(request, user);
+    public ResponseEntity<PhysicalAssessmentPostResponse> save(@RequestBody @Valid PhysicalAssessmentPostRequest request) {
+        var savedAssessment = service.save(request);
 
         var physicalAssessmentPostResponse = mapper.toPhysicalAssessmentPostResponse(savedAssessment);
 
@@ -49,5 +49,28 @@ public class PhysicalAssessmentController {
         var physicalAssessmentGetResponse = mapper.toPhysicalAssessmentGetResponse(physicalAssessments);
 
         return ResponseEntity.ok(physicalAssessmentGetResponse);
+    }
+
+    @GetMapping("user/{id}")
+    public ResponseEntity<List<PhysicalAssessmentGetResponse>> findUserAssessmentByUserId(@PathVariable Long id) {
+        var physicalAssessments = service.findUserAssessmentByUserId(id);
+
+        var physicalAssessmentGetResponseList = mapper.toPhysicalAssessmentGetResponseList(physicalAssessments);
+
+        return ResponseEntity.ok(physicalAssessmentGetResponseList);
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> update(@RequestBody @Valid PhysicalAssessmentPutRequest request) {
+        service.update(request);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

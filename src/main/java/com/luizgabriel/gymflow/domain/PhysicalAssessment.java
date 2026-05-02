@@ -12,7 +12,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
+@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PhysicalAssessment {
 

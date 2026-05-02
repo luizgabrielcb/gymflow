@@ -3,7 +3,9 @@ package com.luizgabriel.gymflow.service;
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.domain.Workout;
 import com.luizgabriel.gymflow.domain.WorkoutExercise;
+import com.luizgabriel.gymflow.dto.request.WorkoutExerciseRequest;
 import com.luizgabriel.gymflow.dto.request.WorkoutPostRequest;
+import com.luizgabriel.gymflow.dto.request.WorkoutPutRequest;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
 import com.luizgabriel.gymflow.repository.WorkoutRepository;
@@ -29,7 +31,38 @@ public class WorkoutService {
                 .workoutExercises(new ArrayList<>())
                 .build();
 
-        for (var workoutExerciseRequest : request.exercises()) {
+        insertExercisesToWorkout(workout, request.exercises());
+
+        return workoutRepository.save(workout);
+    }
+
+    public List<Workout> findAll(User user) {
+        return workoutRepository.findAllByUserId(user.getId());
+    }
+
+    public void update(WorkoutPutRequest request, User user) {
+        var workout = workoutRepository.findByIdAndUserId(request.id(), user.getId()).orElseThrow(() ->
+                new NotFoundException("Workout with id " + request.id() + " not found"));
+
+        workout.setName(request.name());
+        workout.setMuscleGroups(request.muscleGroups());
+
+        workout.getWorkoutExercises().clear();
+
+        insertExercisesToWorkout(workout, request.exercises());
+
+        workoutRepository.save(workout);
+    }
+
+    public void delete(Long id, User user) {
+        var workout = workoutRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() ->
+                new NotFoundException("Workout with id " + id + " not found"));
+
+        workoutRepository.delete(workout);
+    }
+
+    private void insertExercisesToWorkout(Workout workout, List<WorkoutExerciseRequest> exercises) {
+        for (var workoutExerciseRequest : exercises) {
 
             var exercise = exerciseRepository.findById(workoutExerciseRequest.exerciseId())
                     .orElseThrow(() ->
@@ -44,11 +77,5 @@ public class WorkoutService {
 
             workout.getWorkoutExercises().add(workoutExercise);
         }
-
-        return workoutRepository.save(workout);
-    }
-
-    public List<Workout> findAllByAuthenticatedUser(User user) {
-        return workoutRepository.findAllByUserId(user.getId());
     }
 }

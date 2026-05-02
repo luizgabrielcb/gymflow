@@ -24,12 +24,12 @@ public class AuthService implements UserDetailsService {
     }
 
     public void register(UserPostRequest request) {
-        if (repository.findByEmail(request.getEmail()) != null) throw new RuntimeException("Email already exists");
+        if (repository.findByEmail(request.email()) != null) throw new RuntimeException("Email already exists");
 
         var user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .name(request.name())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
                 .role(UserRole.USER)
                 .build();
 

@@ -5,6 +5,7 @@ import com.luizgabriel.gymflow.dto.request.UserPutRequest;
 import com.luizgabriel.gymflow.dto.response.UserGetResponse;
 import com.luizgabriel.gymflow.mapper.UserMapper;
 import com.luizgabriel.gymflow.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,6 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserGetResponse>> findAllUsers() {
-
         var userList = service.findAll();
 
         var userGetResponseList = mapper.toUserGetResponseList(userList);
@@ -32,7 +32,6 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<UserGetResponse> findMe(@AuthenticationPrincipal User user) {
-
         var myUser = service.findById(user.getId());
 
         var userGetResponse = mapper.toUserGetResponse(myUser);
@@ -41,27 +40,24 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestParam UserPutRequest request, @AuthenticationPrincipal User user) {
-
+    public ResponseEntity<Void> update(@RequestBody @Valid UserPutRequest request, @AuthenticationPrincipal User user) {
         service.update(user, request);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-
         service.delete(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("me")
     public ResponseEntity<Void> deleteMe(@AuthenticationPrincipal User user) {
-
         service.delete(user.getId());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

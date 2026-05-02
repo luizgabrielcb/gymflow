@@ -1,5 +1,6 @@
 package com.luizgabriel.gymflow.exception;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Log4j2
 public class GlobalErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,5 +40,27 @@ public class GlobalErrorHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(defaultErrorMessage);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<DefaultErrorMessage> handleBadRequestException(BadRequestException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getMessage())
+                .status(e.getStatusCode().value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<DefaultErrorMessage> handleException(Exception e) {
+        log.error("Unexpected error: ", e);
+
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message("An unexpected error occurred. Please try again later.")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(defaultErrorMessage);
     }
 }

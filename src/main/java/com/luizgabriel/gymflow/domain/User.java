@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements UserDetails {
 
@@ -28,12 +28,15 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false)
+    @Setter
     private String name;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String email;
 
     @Column(nullable = false)
+    @Setter
     private String password;
 
     @Enumerated(EnumType.STRING)

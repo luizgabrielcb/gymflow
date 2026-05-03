@@ -4,39 +4,41 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
-@Table(name = "physical_assessments")
+@Table(name = "training_sessions")
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PhysicalAssessment {
+public class TrainingSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Setter
-    @Column(nullable = false)
-    private BigDecimal weight;
-
-    @Setter
-    @Column(nullable = false)
-    private BigDecimal height;
-
-    @Setter
-    @Column(nullable = false)
-    private BigDecimal fatPercentage;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workout_id", nullable = false)
+    private Workout workout;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
     @CreationTimestamp
-    private Instant createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant startedAt;
+
+    @Setter
+    private Instant finishedAt;
+
+    @Setter
+    private Integer duration;
 }

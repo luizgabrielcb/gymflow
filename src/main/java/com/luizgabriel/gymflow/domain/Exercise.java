@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Exercise {
 
@@ -19,9 +19,11 @@ public class Exercise {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Setter
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Setter
     @Column(nullable = false)
     private String muscleGroup;
 

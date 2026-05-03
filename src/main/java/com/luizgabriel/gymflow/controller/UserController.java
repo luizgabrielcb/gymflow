@@ -30,7 +30,7 @@ public class UserController {
         return ResponseEntity.ok(userGetResponseList);
     }
 
-    @GetMapping
+    @GetMapping("me")
     public ResponseEntity<UserGetResponse> findMe(@AuthenticationPrincipal User user) {
         var myUser = service.findById(user.getId());
 

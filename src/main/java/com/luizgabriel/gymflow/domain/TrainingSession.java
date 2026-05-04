@@ -28,6 +28,7 @@ public class TrainingSession {
     @JoinColumn(name = "workout_id", nullable = false)
     private Workout workout;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;

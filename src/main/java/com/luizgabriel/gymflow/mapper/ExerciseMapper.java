@@ -14,6 +14,8 @@ public interface ExerciseMapper {
 
     List<ExerciseGetResponse> toExerciseGetResponseList(List<Exercise> exerciseList);
 
+    ExerciseGetResponse toExerciseGetResponse(Exercise exercise);
+
     Exercise toExercise(ExercisePostRequest exercisePostRequest);
 
     ExercisePostResponse toExercisePostResponse(Exercise exercise);

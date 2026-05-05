@@ -42,6 +42,15 @@ public class ExerciseController {
         return ResponseEntity.ok(exerciseGetResponseList);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<ExerciseGetResponse> findById(@PathVariable Long id) {
+        var exercise = service.findById(id);
+
+        var exerciseGetResponse = mapper.toExerciseGetResponse(exercise);
+
+        return ResponseEntity.ok(exerciseGetResponse);
+    }
+
     @PutMapping
     public ResponseEntity<Void> update(@RequestBody @Valid ExercisePutRequest request) {
         service.update(request);

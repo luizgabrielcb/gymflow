@@ -23,9 +23,12 @@ public class ExerciseService {
         return repository.findAll();
     }
 
+    public Exercise findById(Long id) {
+        return findExerciseOrThrowNotFound(id);
+    }
+
     public void update(ExercisePutRequest request) {
-        var exercise = repository.findById(request.id()).orElseThrow(() ->
-                new NotFoundException("Exercise not found with id: " + request.id()));
+        var exercise = findExerciseOrThrowNotFound(request.id());
 
         exercise.setName(request.name());
         exercise.setMuscleGroup(request.muscleGroup());
@@ -34,9 +37,13 @@ public class ExerciseService {
     }
 
     public void delete(Long id) {
-        var exercise = repository.findById(id).orElseThrow(() ->
-                new NotFoundException("Exercise not found with id: " + id));
+        var exercise = findExerciseOrThrowNotFound(id);
 
         repository.deleteById(exercise.getId());
+    }
+
+    private Exercise findExerciseOrThrowNotFound(Long id) {
+        return repository.findById(id).orElseThrow(() ->
+                new NotFoundException("Exercise with id " + id + " not found"));
     }
 }

@@ -2,6 +2,7 @@ package com.luizgabriel.gymflow.exception;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -65,6 +66,16 @@ public class GlobalErrorHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<DefaultErrorMessage> handleBadCredentialsException(BadCredentialsException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<DefaultErrorMessage> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         var defaultErrorMessage = DefaultErrorMessage.builder()
                 .message(e.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())

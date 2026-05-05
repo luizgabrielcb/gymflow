@@ -1,5 +1,6 @@
 package com.luizgabriel.gymflow.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +31,7 @@ public class SecurityConfiguration {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(getExceptionHandlingCustomizer())
                 .authorizeHttpRequests(getAuthorizeHttpRequests())
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -61,5 +64,19 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.DELETE, "v1/exercises/{id}").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "v1/exercises").hasRole("ADMIN")
                 .anyRequest().authenticated();
+    }
+
+    private static Customizer<ExceptionHandlingConfigurer<HttpSecurity>> getExceptionHandlingCustomizer() {
+        return ex -> ex
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\": \"Access denied\", \"status\": 403}");
+                })
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\": \"Unauthorized\", \"status\": 401}");
+                });
     }
 }

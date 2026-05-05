@@ -4,7 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,7 +36,7 @@ public class GlobalErrorHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<DefaultErrorMessage> handleNotFoundException(NotFoundException e) {
         var defaultErrorMessage = DefaultErrorMessage.builder()
-                .message(e.getMessage())
+                .message(e.getReason())
                 .status(e.getStatusCode().value())
                 .build();
 
@@ -45,8 +46,28 @@ public class GlobalErrorHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<DefaultErrorMessage> handleBadRequestException(BadRequestException e) {
         var defaultErrorMessage = DefaultErrorMessage.builder()
-                .message(e.getMessage())
+                .message(e.getReason())
                 .status(e.getStatusCode().value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<DefaultErrorMessage> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<DefaultErrorMessage> handleBadCredentialsException(BadCredentialsException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);

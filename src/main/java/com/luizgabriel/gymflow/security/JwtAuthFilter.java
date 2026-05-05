@@ -27,7 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 var email = tokenService.validateToken(token);
-                var user = userRepository.findByEmail(email);
+                var user = userRepository.findByEmail(email).orElseThrow(() -> new JWTVerificationException("User not found"));
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (JWTVerificationException e) {

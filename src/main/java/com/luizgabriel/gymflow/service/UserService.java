@@ -22,12 +22,13 @@ public class UserService {
     }
 
     public User findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+        return findUserByIdOrThrowNotFound(id);
     }
 
     public void delete(Long id) {
-        var userToDelete = findById(id);
-        repository.deleteById(userToDelete.getId());
+        var userToDelete = findUserByIdOrThrowNotFound(id);
+
+        repository.delete(userToDelete);
     }
 
     public void update(User authenticatedUser, UserPutRequest request) {
@@ -36,5 +37,9 @@ public class UserService {
         authenticatedUser.setPassword(passwordEncoder.encode(request.password()));
 
         repository.save(authenticatedUser);
+    }
+
+    private User findUserByIdOrThrowNotFound(Long id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
     }
 }

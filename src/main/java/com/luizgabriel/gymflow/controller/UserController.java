@@ -30,6 +30,15 @@ public class UserController {
         return ResponseEntity.ok(userGetResponseList);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<UserGetResponse> findById(@PathVariable Long id) {
+        var user = service.findById(id);
+
+        var userGetResponse = mapper.toUserGetResponse(user);
+
+        return ResponseEntity.ok(userGetResponse);
+    }
+
     @GetMapping("me")
     public ResponseEntity<UserGetResponse> findMe(@AuthenticationPrincipal User user) {
         var myUser = service.findById(user.getId());
@@ -59,5 +68,4 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
-
 }

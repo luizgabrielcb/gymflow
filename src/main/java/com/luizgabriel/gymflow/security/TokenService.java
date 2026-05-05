@@ -30,16 +30,12 @@ public class TokenService {
     }
 
     public String validateToken(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm)
-                    .withIssuer("gymflow-api")
-                    .build()
-                    .verify(token)
-                    .getSubject();
-        } catch (JWTCreationException exception) {
-            return "";
-        }
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.require(algorithm)
+                .withIssuer("gymflow-api")
+                .build()
+                .verify(token)
+                .getSubject();
     }
 
     private Instant geraTokenExpiration() {

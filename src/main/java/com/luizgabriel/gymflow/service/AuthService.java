@@ -3,6 +3,7 @@ package com.luizgabriel.gymflow.service;
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.domain.UserRole;
 import com.luizgabriel.gymflow.dto.request.UserPostRequest;
+import com.luizgabriel.gymflow.exception.BadRequestException;
 import com.luizgabriel.gymflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,11 +21,11 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return repository.findByEmail(email);
+        return repository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
     }
 
     public void register(UserPostRequest request) {
-        if (repository.findByEmail(request.email()) != null) throw new RuntimeException("Email already exists");
+        if (repository.findByEmail(request.email()).isPresent()) throw new BadRequestException("Email already exists");
 
         var user = User.builder()
                 .name(request.name())

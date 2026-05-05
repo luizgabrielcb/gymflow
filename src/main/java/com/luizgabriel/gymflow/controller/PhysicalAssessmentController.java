@@ -44,7 +44,7 @@ public class PhysicalAssessmentController {
 
     @GetMapping("{id}")
     public ResponseEntity<PhysicalAssessmentGetResponse> findById(@PathVariable Long id) {
-        var physicalAssessments = service.findByIdOrThrowNotFound(id);
+        var physicalAssessments = service.findAssessmentByIdOrThrowNotFound(id);
 
         var physicalAssessmentGetResponse = mapper.toPhysicalAssessmentGetResponse(physicalAssessments);
 

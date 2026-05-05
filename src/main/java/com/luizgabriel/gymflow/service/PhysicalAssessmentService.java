@@ -24,15 +24,13 @@ public class PhysicalAssessmentService {
     }
 
     public List<PhysicalAssessment> findUserAssessmentByUserId(Long id) {
+        findUserOrThrowNotFound(id);
+
         return assessmentRepository.findByUserId(id);
     }
 
-    public PhysicalAssessment findByIdOrThrowNotFound(Long id) {
-        return assessmentRepository.findById(id).orElseThrow(() -> new NotFoundException("Physical Assessment not Found"));
-    }
-
     public PhysicalAssessment save(PhysicalAssessmentPostRequest request) {
-        var user = userRepository.findById(request.userId()).orElseThrow(() -> new NotFoundException("User not Found"));
+        var user = findUserOrThrowNotFound(request.userId());
 
         var physicalAssessment = PhysicalAssessment.builder()
                 .weight(request.weight())
@@ -45,7 +43,7 @@ public class PhysicalAssessmentService {
     }
 
     public void update(PhysicalAssessmentPutRequest request) {
-        var physicalAssessment = assessmentRepository.findById(request.id()).orElseThrow(() -> new NotFoundException("Physical Assessment not Found"));
+        var physicalAssessment = findAssessmentByIdOrThrowNotFound(request.id());
 
         physicalAssessment.setWeight(request.weight());
         physicalAssessment.setHeight(request.height());
@@ -55,8 +53,18 @@ public class PhysicalAssessmentService {
     }
 
     public void delete(Long id) {
-        var physicalAssessmentToDelete = findByIdOrThrowNotFound(id);
+        var physicalAssessmentToDelete = findAssessmentByIdOrThrowNotFound(id);
 
         assessmentRepository.delete(physicalAssessmentToDelete);
+    }
+
+    public PhysicalAssessment findAssessmentByIdOrThrowNotFound(Long id) {
+        return assessmentRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("Physical Assessment with id " + id + " not found"));
+    }
+
+    private User findUserOrThrowNotFound(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("User with id " + userId + " not found"));
     }
 }

@@ -1,5 +1,6 @@
 package com.luizgabriel.gymflow.security;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.luizgabriel.gymflow.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,10 +25,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = recoverToken(request);
         if (token != null) {
-            var email = tokenService.validateToken(token);
-            var user = userRepository.findByEmail(email);
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                var email = tokenService.validateToken(token);
+                var user = userRepository.findByEmail(email);
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (JWTVerificationException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\": \"" + e.getMessage() + "\", \"status\": 401}");
+                return;
+            }
         }
         filterChain.doFilter(request, response);
     }

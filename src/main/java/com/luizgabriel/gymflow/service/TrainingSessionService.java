@@ -41,8 +41,8 @@ public class TrainingSessionService {
         return trainingSessionRepository.save(trainingSession);
     }
 
-    public SessionSet addSet(SessionSetPostRequest request, User user) {
-        var trainingSession = getTrainingSessionOrThrowNotFound(request.trainingSessionId());
+    public SessionSet addSet(Long trainingSessionId, SessionSetPostRequest request, User user) {
+        var trainingSession = getTrainingSessionOrThrowNotFound(trainingSessionId);
 
         validateTrainingSessionOwnership(trainingSession, user);
 

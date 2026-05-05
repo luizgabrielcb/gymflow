@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record PhysicalAssessmentPostRequest(@NotNull(message = "The field 'weight' cannot be null") BigDecimal weight,
-                                            @NotNull(message = "The field 'height' cannot be null") BigDecimal height,
-                                            @NotNull(message = "The field 'fatPercentage' cannot be null") BigDecimal fatPercentage,
-                                            @NotNull(message = "The field 'userId' cannot be null") Long userId) {
+public record PhysicalAssessmentPostRequest(@NotNull(message = "The field 'weight' is required") BigDecimal weight,
+                                            @NotNull(message = "The field 'height' is required") BigDecimal height,
+                                            @NotNull(message = "The field 'fatPercentage' is required") BigDecimal fatPercentage,
+                                            @NotNull(message = "The field 'userId' is required") Long userId) {
 }

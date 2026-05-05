@@ -7,9 +7,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 public record SessionSetPostRequest(
-        @NotNull(message = "The field 'trainingSessionId' is required")
-        Long trainingSessionId,
-
         @NotNull(message = "The field 'exerciseId' is required")
         Long exerciseId,
 

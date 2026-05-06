@@ -34,8 +34,8 @@ public class TrainingSessionController {
     }
 
     @PostMapping("{id}/sets")
-    public ResponseEntity<SessionSetIdPostResponse> addSet(@Valid @PathVariable Long id,
-                                                           @RequestBody SessionSetPostRequest request,
+    public ResponseEntity<SessionSetIdPostResponse> addSet(@PathVariable Long id,
+                                                           @Valid @RequestBody SessionSetPostRequest request,
                                                            @AuthenticationPrincipal User user) {
         var sessionSetSaved = service.addSet(id, request, user);
 

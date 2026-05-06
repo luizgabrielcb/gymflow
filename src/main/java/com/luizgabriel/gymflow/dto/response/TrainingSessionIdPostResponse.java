@@ -1,4 +1,4 @@
 package com.luizgabriel.gymflow.dto.response;
 
-public record TrainingSessionIdPostResponse(Long trainingSessionId) {
+public record TrainingSessionIdPostResponse(Long id) {
 }

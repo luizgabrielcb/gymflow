@@ -73,9 +73,11 @@ public class TrainingSessionService {
 
         trainingSession.setStatus(Status.COMPLETED);
 
-        trainingSession.setFinishedAt(Instant.now());
+        var finishedAt = Instant.now();
 
-        trainingSession.setDuration((int) Duration.between(trainingSession.getStartedAt(), trainingSession.getFinishedAt()).toMinutes());
+        trainingSession.setFinishedAt(finishedAt);
+
+        trainingSession.setDuration((int) Duration.between(trainingSession.getStartedAt(), finishedAt).toMinutes());
 
         trainingSessionRepository.save(trainingSession);
     }

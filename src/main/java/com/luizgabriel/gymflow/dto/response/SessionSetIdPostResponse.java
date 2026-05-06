@@ -1,4 +1,4 @@
 package com.luizgabriel.gymflow.dto.response;
 
-public record SessionSetIdPostResponse(Long sessionSetId) {
+public record SessionSetIdPostResponse(Long id) {
 }

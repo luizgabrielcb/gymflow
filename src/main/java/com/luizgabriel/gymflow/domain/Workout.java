@@ -20,7 +20,7 @@ public class Workout {
     private Long id;
 
     @Setter
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Setter

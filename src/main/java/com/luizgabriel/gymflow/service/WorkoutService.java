@@ -6,6 +6,7 @@ import com.luizgabriel.gymflow.domain.WorkoutExercise;
 import com.luizgabriel.gymflow.dto.request.WorkoutExerciseRequest;
 import com.luizgabriel.gymflow.dto.request.WorkoutPostRequest;
 import com.luizgabriel.gymflow.dto.request.WorkoutPutRequest;
+import com.luizgabriel.gymflow.exception.BadRequestException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
 import com.luizgabriel.gymflow.repository.WorkoutRepository;
@@ -23,7 +24,6 @@ public class WorkoutService {
     private final ExerciseRepository exerciseRepository;
 
     public Workout save(WorkoutPostRequest request, User user) {
-
         var workout = Workout.builder()
                 .name(request.name())
                 .muscleGroups(request.muscleGroups())
@@ -41,8 +41,9 @@ public class WorkoutService {
     }
 
     public void update(WorkoutPutRequest request, User user) {
-        var workout = workoutRepository.findByIdAndUserId(request.id(), user.getId()).orElseThrow(() ->
-                new NotFoundException("Workout with id " + request.id() + " not found"));
+        var workout = findWorkoutOrThrowNotFound(request.id());
+
+        validateWorkoutOwnership(workout, user);
 
         workout.setName(request.name());
         workout.setMuscleGroups(request.muscleGroups());
@@ -55,8 +56,9 @@ public class WorkoutService {
     }
 
     public void delete(Long id, User user) {
-        var workout = workoutRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() ->
-                new NotFoundException("Workout with id " + id + " not found"));
+        var workout = findWorkoutOrThrowNotFound(id);
+
+        validateWorkoutOwnership(workout, user);
 
         workoutRepository.delete(workout);
     }
@@ -76,6 +78,17 @@ public class WorkoutService {
                     .build();
 
             workout.getWorkoutExercises().add(workoutExercise);
+        }
+    }
+
+    private Workout findWorkoutOrThrowNotFound(Long workoutId) {
+        return workoutRepository.findById(workoutId)
+                .orElseThrow(() -> new NotFoundException("Workout with id " + workoutId + " not found"));
+    }
+
+    private void validateWorkoutOwnership(Workout workout, User user) {
+        if (!workout.getUser().getId().equals(user.getId())) {
+            throw new BadRequestException("You do not have permission to access this workout");
         }
     }
 }

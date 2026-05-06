@@ -7,6 +7,10 @@ import com.luizgabriel.gymflow.dto.response.TrainingSessionGetResponse;
 import com.luizgabriel.gymflow.dto.response.TrainingSessionIdPostResponse;
 import com.luizgabriel.gymflow.mapper.TrainingSessionMapper;
 import com.luizgabriel.gymflow.service.TrainingSessionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,11 +23,18 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/training-sessions")
 @RequiredArgsConstructor
+@Tag(name = "Training Sessions", description = "Training session management")
 public class TrainingSessionController {
 
     private final TrainingSessionService service;
     private final TrainingSessionMapper mapper;
 
+    @Operation(summary = "Start a new training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Training session started successfully"),
+            @ApiResponse(responseCode = "400", description = "Active session already exists or workout not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PostMapping
     public ResponseEntity<TrainingSessionIdPostResponse> startSession(@RequestParam Long workoutId, @AuthenticationPrincipal User user) {
         var trainingSessionStarted = service.startSession(workoutId, user);
@@ -33,6 +44,13 @@ public class TrainingSessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(trainingSessionIdPostResponse);
     }
 
+    @Operation(summary = "Add a set to a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Set added successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress or duplicate set"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Session not found")
+    })
     @PostMapping("{id}/sets")
     public ResponseEntity<SessionSetIdPostResponse> addSet(@PathVariable Long id,
                                                            @Valid @RequestBody SessionSetPostRequest request,
@@ -44,6 +62,13 @@ public class TrainingSessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(sessionSetIdPostResponse);
     }
 
+    @Operation(summary = "Finish a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Training session finished successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Session not found")
+    })
     @PatchMapping({"{id}/finish"})
     public ResponseEntity<Void> finishTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
         service.finishTrainingSession(id, user);
@@ -51,6 +76,13 @@ public class TrainingSessionController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Cancel a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Training session cancelled successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Session not found")
+    })
     @PatchMapping("{id}/cancel")
     public ResponseEntity<Void> cancelTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
         service.cancelTrainingSession(id, user);
@@ -58,6 +90,11 @@ public class TrainingSessionController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get all training sessions from authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Training sessions retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping
     public ResponseEntity<List<TrainingSessionGetResponse>> findAll(@AuthenticationPrincipal User user) {
         var trainingSessionList = service.findAll(user);
@@ -67,6 +104,12 @@ public class TrainingSessionController {
         return ResponseEntity.ok(trainingSessionGetResponseList);
     }
 
+    @Operation(summary = "Get current active training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Current session retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "No active session found")
+    })
     @GetMapping("current")
     public ResponseEntity<TrainingSessionGetResponse> findCurrentTrainingSession(@AuthenticationPrincipal User user) {
         var currentTrainingSession = service.findCurrentTrainingSession(user);
@@ -76,6 +119,12 @@ public class TrainingSessionController {
         return ResponseEntity.ok(trainingSessionGetResponse);
     }
 
+    @Operation(summary = "Get training session by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Training session retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Session not found")
+    })
     @GetMapping("{id}")
     public ResponseEntity<TrainingSessionGetResponse> findById(@PathVariable Long id, @AuthenticationPrincipal User user) {
         var trainingSession = service.findById(id, user);

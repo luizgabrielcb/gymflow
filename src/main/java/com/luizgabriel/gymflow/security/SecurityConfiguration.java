@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(getExceptionHandlingCustomizer())
                 .authorizeHttpRequests(getAuthorizeHttpRequests())
+                .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -53,6 +54,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/v1/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/v1/auth/register").permitAll()
+                .requestMatchers("/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/users").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/v1/users/me").authenticated()
                 .requestMatchers(HttpMethod.GET, "/v1/users/{id}").hasRole("ADMIN")

@@ -1,5 +1,6 @@
 package com.luizgabriel.gymflow.service;
 
+import com.luizgabriel.gymflow.domain.Exercise;
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.domain.Workout;
 import com.luizgabriel.gymflow.domain.WorkoutExercise;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,11 +66,20 @@ public class WorkoutService {
     }
 
     private void insertExercisesToWorkout(Workout workout, List<WorkoutExerciseRequest> exercises) {
-        for (var workoutExerciseRequest : exercises) {
+        var exerciseIds = exercises.stream()
+                .map(WorkoutExerciseRequest::exerciseId)
+                .toList();
 
-            var exercise = exerciseRepository.findById(workoutExerciseRequest.exerciseId())
-                    .orElseThrow(() ->
-                            new NotFoundException("Exercise with id " + workoutExerciseRequest.exerciseId() + " not found"));
+        var exerciseMap = exerciseRepository.findAllById(exerciseIds)
+                .stream()
+                .collect(Collectors.toMap(Exercise::getId, e -> e));
+
+        for (var workoutExerciseRequest : exercises) {
+            var exercise = exerciseMap.get(workoutExerciseRequest.exerciseId());
+
+            if (exercise == null) {
+                throw new NotFoundException("Exercise with id " + workoutExerciseRequest.exerciseId() + " not found");
+            }
 
             var workoutExercise = WorkoutExercise.builder()
                     .workout(workout)

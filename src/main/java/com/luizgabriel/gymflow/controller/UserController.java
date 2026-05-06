@@ -41,9 +41,7 @@ public class UserController {
 
     @GetMapping("me")
     public ResponseEntity<UserGetResponse> findMe(@AuthenticationPrincipal User user) {
-        var myUser = service.findById(user.getId());
-
-        var userGetResponse = mapper.toUserGetResponse(myUser);
+        var userGetResponse = mapper.toUserGetResponse(user);
 
         return ResponseEntity.ok(userGetResponse);
     }

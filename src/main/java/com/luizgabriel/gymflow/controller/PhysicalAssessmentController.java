@@ -7,6 +7,7 @@ import com.luizgabriel.gymflow.dto.response.PhysicalAssessmentGetResponse;
 import com.luizgabriel.gymflow.dto.response.PhysicalAssessmentPostResponse;
 import com.luizgabriel.gymflow.mapper.PhysicalAssessmentMapper;
 import com.luizgabriel.gymflow.service.PhysicalAssessmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/physical-assessments")
 @RequiredArgsConstructor
+@Tag(name = "Physical Assessments", description = "Physical assessment management")
 public class PhysicalAssessmentController {
 
     private final PhysicalAssessmentService service;

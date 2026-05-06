@@ -5,6 +5,7 @@ import com.luizgabriel.gymflow.dto.request.UserPostRequest;
 import com.luizgabriel.gymflow.dto.response.LoginResponse;
 import com.luizgabriel.gymflow.service.AuthFacade;
 import com.luizgabriel.gymflow.service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("v1/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "Authentication and registration")
 public class AuthController {
 
     private final AuthService authService;

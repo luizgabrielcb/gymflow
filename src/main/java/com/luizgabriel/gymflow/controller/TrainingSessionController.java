@@ -7,6 +7,7 @@ import com.luizgabriel.gymflow.dto.response.TrainingSessionGetResponse;
 import com.luizgabriel.gymflow.dto.response.TrainingSessionIdPostResponse;
 import com.luizgabriel.gymflow.mapper.TrainingSessionMapper;
 import com.luizgabriel.gymflow.service.TrainingSessionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/training-sessions")
 @RequiredArgsConstructor
+@Tag(name = "Training Sessions", description = "Training session management")
 public class TrainingSessionController {
 
     private final TrainingSessionService service;

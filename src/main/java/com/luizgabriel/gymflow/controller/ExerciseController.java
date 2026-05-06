@@ -6,6 +6,7 @@ import com.luizgabriel.gymflow.dto.response.ExerciseGetResponse;
 import com.luizgabriel.gymflow.dto.response.ExercisePostResponse;
 import com.luizgabriel.gymflow.mapper.ExerciseMapper;
 import com.luizgabriel.gymflow.service.ExerciseService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/exercises")
 @RequiredArgsConstructor
+@Tag(name = "Exercises", description = "Exercise management")
 public class ExerciseController {
 
     private final ExerciseService service;

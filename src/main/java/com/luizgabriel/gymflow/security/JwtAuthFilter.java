@@ -31,10 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (JWTVerificationException e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json");
-                response.getWriter().write("{\"message\": \"" + e.getMessage() + "\", \"status\": 401}");
-                return;
+                SecurityContextHolder.clearContext();
             }
         }
         filterChain.doFilter(request, response);
@@ -42,7 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if (authHeader == null) return null;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
         return authHeader.substring(7);
     }
 }

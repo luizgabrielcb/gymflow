@@ -5,6 +5,7 @@ import com.luizgabriel.gymflow.dto.request.UserPutRequest;
 import com.luizgabriel.gymflow.dto.response.UserGetResponse;
 import com.luizgabriel.gymflow.mapper.UserMapper;
 import com.luizgabriel.gymflow.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "User management")
 public class UserController {
 
     private final UserService service;

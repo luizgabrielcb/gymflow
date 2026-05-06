@@ -22,7 +22,7 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("gymflow-api")
                     .withSubject(userDetails.getUsername())
-                    .withExpiresAt(geraTokenExpiration())
+                    .withExpiresAt(generateTokenExpiration())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro ao gerar token JWT", exception);
@@ -38,7 +38,7 @@ public class TokenService {
                 .getSubject();
     }
 
-    private Instant geraTokenExpiration() {
+    private Instant generateTokenExpiration() {
         return Instant.now().plus(Duration.ofHours(2));
     }
 }

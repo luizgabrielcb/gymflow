@@ -42,6 +42,10 @@ public class PhysicalAssessmentService {
         return assessmentRepository.save(physicalAssessment);
     }
 
+    public PhysicalAssessment findById(Long id) {
+        return findAssessmentByIdOrThrowNotFound(id);
+    }
+
     public void update(PhysicalAssessmentPutRequest request) {
         var physicalAssessment = findAssessmentByIdOrThrowNotFound(request.id());
 
@@ -58,7 +62,7 @@ public class PhysicalAssessmentService {
         assessmentRepository.delete(physicalAssessmentToDelete);
     }
 
-    public PhysicalAssessment findAssessmentByIdOrThrowNotFound(Long id) {
+    private PhysicalAssessment findAssessmentByIdOrThrowNotFound(Long id) {
         return assessmentRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Physical Assessment with id " + id + " not found"));
     }

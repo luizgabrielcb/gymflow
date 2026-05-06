@@ -7,6 +7,9 @@ import com.luizgabriel.gymflow.dto.response.WorkoutGetResponse;
 import com.luizgabriel.gymflow.dto.response.WorkoutPostResponse;
 import com.luizgabriel.gymflow.mapper.WorkoutMapper;
 import com.luizgabriel.gymflow.service.WorkoutService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,12 @@ public class WorkoutController {
     private final WorkoutService service;
     private final WorkoutMapper mapper;
 
+    @Operation(summary = "Create a new workout")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Workout created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data or duplicate name"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PostMapping
     public ResponseEntity<WorkoutPostResponse> save(@RequestBody @Valid WorkoutPostRequest request,
                                                     @AuthenticationPrincipal User user) {
@@ -36,6 +45,11 @@ public class WorkoutController {
         return ResponseEntity.status(HttpStatus.CREATED).body(workoutPostResponse);
     }
 
+    @Operation(summary = "Get all workouts from authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Workouts retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping
     public ResponseEntity<List<WorkoutGetResponse>> findAll(@AuthenticationPrincipal User user) {
         var workoutList = service.findAll(user);
@@ -45,6 +59,12 @@ public class WorkoutController {
         return ResponseEntity.status(HttpStatus.OK).body(workoutGetResponseList);
     }
 
+    @Operation(summary = "Update a workout")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Workout updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data or duplicate name"),
+            @ApiResponse(responseCode = "404", description = "Workout not found")
+    })
     @PutMapping
     public ResponseEntity<Void> update(@RequestBody @Valid WorkoutPutRequest request, @AuthenticationPrincipal User user) {
         service.update(request, user);
@@ -52,6 +72,12 @@ public class WorkoutController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Delete a workout")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Workout deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Workout not found"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal User user) {
         service.delete(id, user);

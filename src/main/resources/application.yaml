@@ -26,3 +26,7 @@ logging:
 
 jwt:
   secret: ${ENV_JWT_SECRET:"gymflow-secret-key"}
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha

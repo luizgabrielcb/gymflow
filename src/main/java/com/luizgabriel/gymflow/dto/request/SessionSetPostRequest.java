@@ -3,9 +3,11 @@ package com.luizgabriel.gymflow.dto.request;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record SessionSetPostRequest(
         @NotNull(message = "The field 'exerciseId' is required")
         Long exerciseId,

@@ -25,18 +25,18 @@ public class UserService {
         return findUserByIdOrThrowNotFound(id);
     }
 
-    public void delete(Long id) {
-        var userToDelete = findUserByIdOrThrowNotFound(id);
-
-        repository.delete(userToDelete);
-    }
-
     public void update(User authenticatedUser, UserPutRequest request) {
         authenticatedUser.setName(request.name());
         authenticatedUser.setEmail(request.email());
         authenticatedUser.setPassword(passwordEncoder.encode(request.password()));
 
         repository.save(authenticatedUser);
+    }
+
+    public void delete(Long id) {
+        var userToDelete = findUserByIdOrThrowNotFound(id);
+
+        repository.delete(userToDelete);
     }
 
     private User findUserByIdOrThrowNotFound(Long id) {

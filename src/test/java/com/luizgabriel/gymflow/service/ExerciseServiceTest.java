@@ -40,7 +40,7 @@ class ExerciseServiceTest {
 
     @Test
     @DisplayName("findAll returns a list with all exercises when successful")
-    void findAll_ReturnsListWithAllExercise_WhenSuccessful() {
+    void findAll_ReturnsListWithAllExercises_WhenSuccessful() {
         var exercise = utils.newExercise();
 
         var exerciseSingletonList = Collections.singletonList(exercise);
@@ -53,7 +53,7 @@ class ExerciseServiceTest {
     }
 
     @Test
-    @DisplayName("save returns a empty list when exercise not found")
+    @DisplayName("findAll returns a empty list when exercise not found")
     void findAll_ReturnsEmptyList_WhenExerciseNotFound() {
         BDDMockito.when(repository.findAll()).thenReturn(Collections.emptyList());
 

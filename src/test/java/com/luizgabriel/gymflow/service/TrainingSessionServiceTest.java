@@ -375,7 +375,7 @@ class TrainingSessionServiceTest {
 
         var trainingSessionList = service.findAll(trainingSession.getUser());
 
-        Assertions.assertThat(trainingSessionList).isEqualTo(trainingSessionListExpected).hasSize(1);
+        Assertions.assertThat(trainingSessionList).isNotNull().isEqualTo(trainingSessionListExpected).hasSize(1);
     }
 
     @Test

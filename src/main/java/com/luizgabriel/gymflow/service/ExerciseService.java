@@ -39,7 +39,7 @@ public class ExerciseService {
     public void delete(Long id) {
         var exercise = findExerciseOrThrowNotFound(id);
 
-        repository.deleteById(exercise.getId());
+        repository.delete(exercise);
     }
 
     private Exercise findExerciseOrThrowNotFound(Long id) {

@@ -19,16 +19,6 @@ public class PhysicalAssessmentService {
     private final PhysicalAssessmentRepository assessmentRepository;
     private final UserRepository userRepository;
 
-    public List<PhysicalAssessment> findByAuthenticatedUser(User user) {
-        return assessmentRepository.findByUserId(user.getId());
-    }
-
-    public List<PhysicalAssessment> findUserAssessmentByUserId(Long id) {
-        findUserOrThrowNotFound(id);
-
-        return assessmentRepository.findByUserId(id);
-    }
-
     public PhysicalAssessment save(PhysicalAssessmentPostRequest request) {
         var user = findUserOrThrowNotFound(request.userId());
 
@@ -40,6 +30,16 @@ public class PhysicalAssessmentService {
                 .build();
 
         return assessmentRepository.save(physicalAssessment);
+    }
+
+    public List<PhysicalAssessment> findByAuthenticatedUser(User user) {
+        return assessmentRepository.findByUserId(user.getId());
+    }
+
+    public List<PhysicalAssessment> findUserAssessmentByUserId(Long id) {
+        findUserOrThrowNotFound(id);
+
+        return assessmentRepository.findByUserId(id);
     }
 
     public PhysicalAssessment findById(Long id) {

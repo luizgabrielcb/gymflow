@@ -113,8 +113,6 @@ class WorkoutServiceTest {
                         .map(WorkoutExerciseRequest::exerciseId).toList()))
                 .thenReturn(List.of(exercise));
 
-        BDDMockito.when(workoutRepository.save(ArgumentMatchers.any())).thenReturn(workout);
-
         service.update(workoutPutRequest, workout.getUser());
 
         BDDMockito.then(workoutRepository).should().save(ArgumentMatchers.any(Workout.class));

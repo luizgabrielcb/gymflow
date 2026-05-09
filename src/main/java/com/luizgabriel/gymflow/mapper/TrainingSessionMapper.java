@@ -22,7 +22,7 @@ public interface TrainingSessionMapper {
     SessionSetIdPostResponse toSessionSetIdPostResponse(SessionSet sessionSet);
 
     @Mapping(target = "workoutName", source = "workout.name")
-    @Mapping(target = "durationMinutes", source = "duration")
+    @Mapping(target = "durationMinutes", source = "durationMinutes")
     TrainingSessionGetResponse toTrainingSessionGetResponse(TrainingSession trainingSession);
 
     @Mapping(target = "exerciseName", source = "exercise.name")

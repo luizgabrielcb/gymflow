@@ -77,7 +77,7 @@ public class TrainingSessionService {
 
         trainingSession.setFinishedAt(finishedAt);
 
-        trainingSession.setDuration((int) Duration.between(trainingSession.getStartedAt(), finishedAt).toMinutes());
+        trainingSession.setDurationMinutes((int) Duration.between(trainingSession.getStartedAt(), finishedAt).toMinutes());
 
         trainingSessionRepository.save(trainingSession);
     }

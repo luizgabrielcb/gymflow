@@ -42,7 +42,7 @@ public class TrainingSession {
     private Instant finishedAt;
 
     @Setter
-    private Integer duration;
+    private Integer durationMinutes;
 
     @Setter
     @Getter

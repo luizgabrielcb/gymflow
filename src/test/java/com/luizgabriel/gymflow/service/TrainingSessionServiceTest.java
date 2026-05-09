@@ -256,7 +256,7 @@ class TrainingSessionServiceTest {
 
         Assertions.assertThat(trainingSession.getStatus()).isEqualTo(Status.COMPLETED);
         Assertions.assertThat(trainingSession.getFinishedAt()).isNotNull();
-        Assertions.assertThat(trainingSession.getDuration()).isNotNull();
+        Assertions.assertThat(trainingSession.getDurationMinutes()).isNotNull();
 
         BDDMockito.then(trainingSessionRepository).should().save(trainingSession);
     }
@@ -316,7 +316,7 @@ class TrainingSessionServiceTest {
 
         Assertions.assertThat(trainingSession.getStatus()).isEqualTo(Status.CANCELLED);
         Assertions.assertThat(trainingSession.getFinishedAt()).isNull();
-        Assertions.assertThat(trainingSession.getDuration()).isNull();
+        Assertions.assertThat(trainingSession.getDurationMinutes()).isNull();
 
         BDDMockito.then(trainingSessionRepository).should().save(trainingSession);
     }

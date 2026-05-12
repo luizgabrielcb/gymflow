@@ -60,14 +60,14 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/v1/users/{id}").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/v1/users/me").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/v1/users/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "v1/physical-assessments/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "v1/physical-assessments/user/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "v1/physical-assessments").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "v1/physical-assessments").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "v1/physical-assessments/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "v1/exercises").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "v1/exercises/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "v1/exercises").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/v1/physical-assessments/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/v1/physical-assessments/user/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/v1/physical-assessments").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/v1/physical-assessments").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/v1/physical-assessments/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/v1/exercises").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/v1/exercises/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/v1/exercises").hasRole("ADMIN")
                 .anyRequest().authenticated();
     }
 

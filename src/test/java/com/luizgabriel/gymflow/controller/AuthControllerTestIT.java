@@ -54,7 +54,7 @@ class AuthControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("POST v1/auth/register returns 400 bad request when email already exists")
-    @Sql(value = "/sql/user/insert-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void register_ReturnsBadRequest_WhenEmailAlreadyExists() {
         var request = fileUtils.readResourceFile("user/post-request-register-user-email-already-exists.json");
         var response = fileUtils.readResourceFile("user/post-response-register-user-email-already-exists-400.json");
@@ -72,7 +72,7 @@ class AuthControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("POST v1/auth/login returns 200 login response when successful")
-    @Sql(value = "/sql/user/insert-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void login_ReturnsLoginResponse_WhenSuccessful() {
         var request = fileUtils.readResourceFile("user/post-request-login-user.json");
         var response = fileUtils.readResourceFile("user/post-response-login-user-200.json");

@@ -2,6 +2,7 @@ package com.luizgabriel.gymflow.service;
 
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.dto.request.UserPutRequest;
+import com.luizgabriel.gymflow.exception.BadRequestException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,12 @@ public class UserService {
     }
 
     public void update(User authenticatedUser, UserPutRequest request) {
+        repository.findByEmailIgnoreCase(request.email())
+                .filter(user -> !user.getId().equals(authenticatedUser.getId()))
+                .ifPresent(user -> {
+                    throw new BadRequestException("Email already exists");
+                });
+
         authenticatedUser.setName(request.name());
         authenticatedUser.setEmail(request.email());
         authenticatedUser.setPassword(passwordEncoder.encode(request.password()));

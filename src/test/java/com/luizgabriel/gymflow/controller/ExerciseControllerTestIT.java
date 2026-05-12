@@ -4,6 +4,7 @@ import com.luizgabriel.gymflow.commons.FileUtils;
 import com.luizgabriel.gymflow.config.AuthenticatedIntegrationConfig;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
+import com.luizgabriel.gymflow.service.ExerciseService;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
@@ -20,6 +21,9 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Autowired
     private ExerciseRepository exerciseRepository;
+
+    @Autowired
+    private ExerciseService exerciseService;
 
     @Autowired
     private FileUtils fileUtils;
@@ -221,7 +225,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     }
 
     @Test
-    @DisplayName("UPDATE v1/exercises returns no content when successful")
+    @DisplayName("PUT v1/exercises returns no content when successful")
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void update_ReturnsNoContent_WhenSuccessful() {
@@ -344,6 +348,9 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .log().all();
+
+        Assertions.assertThatThrownBy(() -> exerciseService.findById(exercise.getFirst().getId()))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

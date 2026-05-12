@@ -32,9 +32,10 @@ public class PhysicalAssessmentController {
     @Operation(summary = "Create a new physical assessment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Physical assessment created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid data or user not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Access denied")
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PostMapping
     public ResponseEntity<PhysicalAssessmentPostResponse> save(@RequestBody @Valid PhysicalAssessmentPostRequest request) {

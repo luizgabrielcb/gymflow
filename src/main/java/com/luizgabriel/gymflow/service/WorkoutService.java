@@ -8,6 +8,7 @@ import com.luizgabriel.gymflow.dto.request.WorkoutExerciseRequest;
 import com.luizgabriel.gymflow.dto.request.WorkoutPostRequest;
 import com.luizgabriel.gymflow.dto.request.WorkoutPutRequest;
 import com.luizgabriel.gymflow.exception.BadRequestException;
+import com.luizgabriel.gymflow.exception.ForbiddenException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
 import com.luizgabriel.gymflow.repository.WorkoutRepository;
@@ -26,6 +27,8 @@ public class WorkoutService {
     private final ExerciseRepository exerciseRepository;
 
     public Workout save(WorkoutPostRequest request, User user) {
+        validateWorkoutNameAlreadyExists(request.name(), user.getId());
+
         var workout = Workout.builder()
                 .name(request.name())
                 .muscleGroups(request.muscleGroups())
@@ -42,10 +45,19 @@ public class WorkoutService {
         return workoutRepository.findAllByUserId(user.getId());
     }
 
+    public Workout findById(Long id, User user) {
+        var workout = findWorkoutOrThrowNotFound(id);
+
+        validateWorkoutOwnership(workout, user);
+
+        return workout;
+    }
+
     public void update(WorkoutPutRequest request, User user) {
         var workout = findWorkoutOrThrowNotFound(request.id());
 
         validateWorkoutOwnership(workout, user);
+        validateWorkoutNameAlreadyExistsForUpdate(request, user);
 
         workout.setName(request.name());
         workout.setMuscleGroups(request.muscleGroups());
@@ -99,7 +111,21 @@ public class WorkoutService {
 
     private void validateWorkoutOwnership(Workout workout, User user) {
         if (!workout.getUser().getId().equals(user.getId())) {
-            throw new BadRequestException("You do not have permission to access this workout");
+            throw new ForbiddenException("You do not have permission to access this workout");
         }
+    }
+
+    private void validateWorkoutNameAlreadyExistsForUpdate(WorkoutPutRequest request, User user) {
+        boolean exists = workoutRepository
+                .existsByNameIgnoreCaseAndUserIdAndIdNot(request.name(), user.getId(), request.id());
+
+        if (exists) throw new BadRequestException("Workout name already exists for this user");
+    }
+
+    private void validateWorkoutNameAlreadyExists(String name, Long userId) {
+        boolean exists = workoutRepository
+                .existsByNameIgnoreCaseAndUserId(name, userId);
+
+        if (exists) throw new BadRequestException("Workout name already exists for this user");
     }
 }

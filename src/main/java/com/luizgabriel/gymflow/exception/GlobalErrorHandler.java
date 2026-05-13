@@ -56,6 +56,16 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(defaultErrorMessage);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<DefaultErrorMessage> handleForbiddenException(ForbiddenException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getReason())
+                .status(e.getStatusCode().value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(defaultErrorMessage);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<DefaultErrorMessage> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         var defaultErrorMessage = DefaultErrorMessage.builder()

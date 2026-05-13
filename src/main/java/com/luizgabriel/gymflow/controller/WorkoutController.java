@@ -63,6 +63,7 @@ public class WorkoutController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Workout updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid data or duplicate name"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Workout not found")
     })
     @PutMapping
@@ -75,8 +76,9 @@ public class WorkoutController {
     @Operation(summary = "Delete a workout")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Workout deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Workout not found"),
-            @ApiResponse(responseCode = "403", description = "Access denied")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Workout not found")
     })
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal User user) {

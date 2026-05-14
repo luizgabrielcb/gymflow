@@ -4,7 +4,7 @@ import com.luizgabriel.gymflow.commons.WorkoutUtils;
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.domain.Workout;
 import com.luizgabriel.gymflow.dto.request.WorkoutExerciseRequest;
-import com.luizgabriel.gymflow.exception.BadRequestException;
+import com.luizgabriel.gymflow.exception.ForbiddenException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
 import com.luizgabriel.gymflow.repository.WorkoutRepository;
@@ -144,7 +144,7 @@ class WorkoutServiceTest {
                 .thenReturn(Optional.of(workout));
 
         Assertions.assertThatThrownBy(() -> service.update(workoutPutRequest, anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         BDDMockito.then(workoutRepository).should(Mockito.never()).save(ArgumentMatchers.any(Workout.class));
     }
@@ -207,7 +207,7 @@ class WorkoutServiceTest {
                 .thenReturn(Optional.of(workout));
 
         Assertions.assertThatThrownBy(() -> service.delete(workout.getId(), anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         BDDMockito.then(workoutRepository).should(Mockito.never()).delete(ArgumentMatchers.any(Workout.class));
     }

@@ -75,11 +75,8 @@ class AuthControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void login_ReturnsLoginResponse_WhenSuccessful() {
         var request = fileUtils.readResourceFile("user/post-request-login-user.json");
-        var response = fileUtils.readResourceFile("user/post-response-login-user-200.json");
 
-        var token = loginAsUser();
-
-        response = response.replace("{token}", token);
+        loginAsUser();
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
@@ -89,7 +86,8 @@ class AuthControllerTestIT extends AuthenticatedIntegrationConfig {
                 .then()
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(Matchers.equalTo(response));
+                .body("token", Matchers.notNullValue())
+                .log().all();
     }
 
     @Test

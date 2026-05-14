@@ -12,11 +12,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("v1/exercises")
@@ -51,12 +53,13 @@ public class ExerciseController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<List<ExerciseGetResponse>> findAll() {
-        var exerciseList = service.findAll();
+    public ResponseEntity<Page<ExerciseGetResponse>> findAll(@PageableDefault(sort = "name", direction = Sort.Direction.ASC)
+                                                             Pageable pageable) {
+        var exercisesPage = service.findAll(pageable);
 
-        var exerciseGetResponseList = mapper.toExerciseGetResponseList(exerciseList);
+        var exerciseGetResponsePage = exercisesPage.map(mapper::toExerciseGetResponse);
 
-        return ResponseEntity.ok(exerciseGetResponseList);
+        return ResponseEntity.ok(exerciseGetResponsePage);
     }
 
     @Operation(summary = "Get exercise by ID")

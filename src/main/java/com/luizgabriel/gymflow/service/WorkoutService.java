@@ -13,6 +13,8 @@ import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
 import com.luizgabriel.gymflow.repository.WorkoutRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,8 +43,8 @@ public class WorkoutService {
         return workoutRepository.save(workout);
     }
 
-    public List<Workout> findAll(User user) {
-        return workoutRepository.findAllByUserId(user.getId());
+    public Page<Workout> findAll(Pageable pageable, User user) {
+        return workoutRepository.findAllByUserId(user.getId(), pageable);
     }
 
     public Workout findById(Long id, User user) {

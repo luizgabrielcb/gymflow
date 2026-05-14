@@ -15,6 +15,7 @@ import org.springframework.test.context.jdbc.SqlMergeMode;
 @Sql(value = "/sql/user/delete-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class AuthControllerTestIT extends AuthenticatedIntegrationConfig {
+
     private static final String URL = "/auth";
 
     @Autowired

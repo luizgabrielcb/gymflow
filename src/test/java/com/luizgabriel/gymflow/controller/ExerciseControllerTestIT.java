@@ -21,6 +21,7 @@ import org.springframework.test.context.jdbc.SqlMergeMode;
 @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
+
     private static final String URL = "/exercises";
 
     @Autowired
@@ -112,10 +113,10 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     }
 
     @Test
-    @DisplayName("GET v1/exercises returns a list with all exercises when successful")
+    @DisplayName("GET v1/exercises returns a page with all exercises when successful")
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsListWithAllExercises_WhenSuccessful() {
+    void findAll_ReturnsPageWithAllExercises_WhenSuccessful() {
         var token = loginAsUser();
 
         var response = fileUtils.readResourceFile("exercise/get-response-two-exercises-200.json");
@@ -131,19 +132,18 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
                 .extract().body().asString();
 
         JsonAssertions.assertThatJson(body)
-                .whenIgnoringPaths("[*].id")
+                .whenIgnoringPaths("content[*].id")
+                .node("content")
                 .isEqualTo(response);
     }
 
     @Test
-    @DisplayName("GET v1/exercises returns an empty list when exercises not found")
+    @DisplayName("GET v1/exercises returns an empty page when exercises not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsEmptyList_WhenExercisesNotFound() {
+    void findAll_ReturnsEmptyPage_WhenExercisesNotFound() {
         var token = loginAsUser();
 
-        var response = fileUtils.readResourceFile("exercise/get-response-empty-list-200.json");
-
-        RestAssured.given()
+        var body = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -151,7 +151,11 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .log().all()
-                .body(Matchers.equalTo(response));
+                .extract().body().asString();
+
+        JsonAssertions.assertThatJson(body)
+                .node("content")
+                .isEqualTo("[]");
     }
 
     @Test

@@ -23,6 +23,7 @@ import org.springframework.test.context.jdbc.SqlMergeMode;
 @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
+
     private static final String URL = "/workouts";
 
     @Autowired
@@ -141,10 +142,10 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     }
 
     @Test
-    @DisplayName("GET v1/workouts returns a list with all workouts from authenticated user when successful status code 200")
+    @DisplayName("GET v1/workouts returns a page with all workouts from authenticated user when successful status code 200")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsListWithAllWorkouts_WhenSuccessful() {
+    void findAll_ReturnsPageWithAllWorkouts_WhenSuccessful() {
         var token = loginAsUser();
 
         var response = fileUtils.readResourceFile("workout/get-response-workout-200.json");
@@ -160,27 +161,30 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
                 .extract().body().asString();
 
         JsonAssertions.assertThatJson(body)
-                .whenIgnoringPaths("[*].id")
+                .whenIgnoringPaths("content[*].id")
+                .node("content")
                 .isEqualTo(response);
     }
 
     @Test
-    @DisplayName("GET v1/workouts returns an empty list when workout not found status code 200")
+    @DisplayName("GET v1/workouts returns an empty page when workout not found status code 200")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsEmptyList_WhenWorkoutNotFound() {
+    void findAll_ReturnsEmptyPage_WhenWorkoutNotFound() {
         var token = loginAsUser();
 
-        var response = fileUtils.readResourceFile("workout/get-response-workout-empty-list-200.json");
-
-        RestAssured.given()
+        var body = RestAssured.given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .when()
                 .get(URL)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body(Matchers.equalTo(response))
-                .log().all();
+                .log().all()
+                .extract().body().asString();
+
+        JsonAssertions.assertThatJson(body)
+                .node("content")
+                .isEqualTo("[]");
     }
 
     @Test

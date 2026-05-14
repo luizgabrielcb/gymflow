@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 @Sql(value = "/sql/user/delete-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig {
+
     private static final String URL = "/physical-assessments";
 
     @Autowired
@@ -143,9 +144,9 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     }
 
     @Test
-    @DisplayName("GET v1/physical-assessments returns a list with all assessments by authenticated user when successful status code 200")
+    @DisplayName("GET v1/physical-assessments returns a page with all assessments by authenticated user when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findByAuthenticatedUser_ReturnsListWithAllAssessments_WhenSuccessful() {
+    void findByAuthenticatedUser_ReturnsPageWithAllAssessments_WhenSuccessful() {
         var token = loginAsAdmin();
 
         createAssessmentForUser(token, "admin.test@gmail.com");
@@ -163,8 +164,30 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
                 .extract().body().asString();
 
         JsonAssertions.assertThatJson(body)
-                .whenIgnoringPaths("[*].id")
+                .whenIgnoringPaths("content[*].id")
+                .node("content")
                 .isEqualTo(response);
+    }
+
+    @Test
+    @DisplayName("GET v1/physical-assessments returns an empty page when assessments not found status code 200")
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void findByAuthenticatedUser_ReturnsEmptyPage_WhenAssessmentsNotFound() {
+        var token = loginAsAdmin();
+
+        var body = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get(URL)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all()
+                .extract().body().asString();
+
+        JsonAssertions.assertThatJson(body)
+                .node("content")
+                .isEqualTo("[]");
     }
 
     @Test
@@ -265,9 +288,9 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     }
 
     @Test
-    @DisplayName("GET v1/physical-assessments/user/{id} returns a list with all assessments by user id when successful status code 200")
+    @DisplayName("GET v1/physical-assessments/user/{id} returns a page with all assessments by user id when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findUserAssessmentByUserId_ReturnsListWithAllAssessments_WhenSuccessful() {
+    void findUserAssessmentByUserId_ReturnsPageWithAllAssessments_WhenSuccessful() {
         var token = loginAsAdmin();
 
         createAssessmentForUser(token, "admin.test@gmail.com");
@@ -289,8 +312,34 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
                 .extract().body().asString();
 
         JsonAssertions.assertThatJson(body)
-                .whenIgnoringPaths("[*].id")
+                .whenIgnoringPaths("content[*].id")
+                .node("content")
                 .isEqualTo(response);
+    }
+
+    @Test
+    @DisplayName("GET v1/physical-assessments/user/{id} returns an empty page when user does not have assessments status code 200")
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void findUserAssessmentByUserId_ReturnsEmptyPage_WhenUserDoesNotHaveAssessments() {
+        var token = loginAsAdmin();
+
+        var user = userRepository.findByEmailIgnoreCase("admin.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var body = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .pathParam("id", user.getId())
+                .get(URL + "/user/{id}")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all()
+                .extract().body().asString();
+
+        JsonAssertions.assertThatJson(body)
+                .node("content")
+                .isEqualTo("[]");
     }
 
     @Test

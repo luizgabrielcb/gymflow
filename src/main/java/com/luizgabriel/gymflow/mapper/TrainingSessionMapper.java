@@ -10,8 +10,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-import java.util.List;
-
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TrainingSessionMapper {
 
@@ -27,6 +25,4 @@ public interface TrainingSessionMapper {
 
     @Mapping(target = "exerciseName", source = "exercise.name")
     SessionSetGetResponse toSessionSetGetResponse(SessionSet sessionSet);
-
-    List<TrainingSessionGetResponse> toTrainingSessionGetResponseList(List<TrainingSession> trainingSessionList);
 }

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -39,25 +42,31 @@ class ExerciseServiceTest {
     }
 
     @Test
-    @DisplayName("findAll returns a list with all exercises when successful")
-    void findAll_ReturnsListWithAllExercises_WhenSuccessful() {
+    @DisplayName("findAll returns a page with all exercises when successful")
+    void findAll_ReturnsPageWithAllExercises_WhenSuccessful() {
         var exercise = utils.newExercise();
 
-        var exerciseSingletonList = Collections.singletonList(exercise);
+        var exercisePage = new PageImpl<>(Collections.singletonList(exercise));
 
-        BDDMockito.when(repository.findAll()).thenReturn(exerciseSingletonList);
+        var pageable = PageRequest.of(0, 1);
 
-        var exerciseList = service.findAll();
+        BDDMockito.when(repository.findAll(pageable)).thenReturn(exercisePage);
 
-        Assertions.assertThat(exerciseList).isNotNull().isEqualTo(exerciseSingletonList);
+        var exerciseList = service.findAll(pageable);
+
+        Assertions.assertThat(exerciseList).isNotNull().isEqualTo(exercisePage);
     }
 
     @Test
-    @DisplayName("findAll returns a empty list when exercise not found")
-    void findAll_ReturnsEmptyList_WhenExerciseNotFound() {
-        BDDMockito.when(repository.findAll()).thenReturn(Collections.emptyList());
+    @DisplayName("findAll returns a empty page when exercise not found")
+    void findAll_ReturnsEmptyPage_WhenExerciseNotFound() {
+        var pageable = PageRequest.of(0, 1);
 
-        var exerciseList = service.findAll();
+        Page<Exercise> emptyPage = Page.empty();
+
+        BDDMockito.when(repository.findAll(pageable)).thenReturn(emptyPage);
+
+        var exerciseList = service.findAll(pageable);
 
         Assertions.assertThat(exerciseList).isNotNull().isEmpty();
     }

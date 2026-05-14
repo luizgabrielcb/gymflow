@@ -13,12 +13,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("v1/workouts")
@@ -51,12 +53,14 @@ public class WorkoutController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<List<WorkoutGetResponse>> findAll(@AuthenticationPrincipal User user) {
-        var workoutList = service.findAll(user);
+    public ResponseEntity<Page<WorkoutGetResponse>> findAll(@PageableDefault(sort = "name", direction = Sort.Direction.ASC)
+                                                            Pageable pageable,
+                                                            @AuthenticationPrincipal User user) {
+        var workoutsPage = service.findAll(pageable, user);
 
-        var workoutGetResponseList = mapper.toWorkoutGetResponseList(workoutList);
+        var workoutGetResponsePage = workoutsPage.map(mapper::toWorkoutGetResponse);
 
-        return ResponseEntity.status(HttpStatus.OK).body(workoutGetResponseList);
+        return ResponseEntity.ok(workoutGetResponsePage);
     }
 
     @Operation(summary = "Update a workout")

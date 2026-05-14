@@ -67,37 +67,8 @@ public class TrainingSessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(sessionSetIdPostResponse);
     }
 
-    @Operation(summary = "Finish a training session")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Training session finished successfully"),
-            @ApiResponse(responseCode = "400", description = "Session not in progress"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
-            @ApiResponse(responseCode = "404", description = "Session not found")
-    })
-    @PatchMapping({"{id}/finish"})
-    public ResponseEntity<Void> finishTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        service.finishTrainingSession(id, user);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Cancel a training session")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Training session cancelled successfully"),
-            @ApiResponse(responseCode = "400", description = "Session not in progress"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
-            @ApiResponse(responseCode = "404", description = "Session not found")
-    })
-    @PatchMapping("{id}/cancel")
-    public ResponseEntity<Void> cancelTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        service.cancelTrainingSession(id, user);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Get all training sessions from authenticated user")
+    @Operation(summary = "Get all training sessions from authenticated user",
+            description = "Use `page` and `size` for pagination. Ignore the `sort` parameter.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Training sessions retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -142,5 +113,35 @@ public class TrainingSessionController {
         var trainingSessionGetResponse = mapper.toTrainingSessionGetResponse(trainingSession);
 
         return ResponseEntity.ok(trainingSessionGetResponse);
+    }
+
+    @Operation(summary = "Finish a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Training session finished successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Session not found")
+    })
+    @PatchMapping({"{id}/finish"})
+    public ResponseEntity<Void> finishTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        service.finishTrainingSession(id, user);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Cancel a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Training session cancelled successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Session not found")
+    })
+    @PatchMapping("{id}/cancel")
+    public ResponseEntity<Void> cancelTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        service.cancelTrainingSession(id, user);
+
+        return ResponseEntity.noContent().build();
     }
 }

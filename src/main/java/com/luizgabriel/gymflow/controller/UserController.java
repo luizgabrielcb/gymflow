@@ -28,7 +28,8 @@ public class UserController {
     private final UserService service;
     private final UserMapper mapper;
 
-    @Operation(summary = "Get all users")
+    @Operation(summary = "Get all users",
+            description = "Use `page` and `size` for pagination. Ignore the `sort` parameter.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),

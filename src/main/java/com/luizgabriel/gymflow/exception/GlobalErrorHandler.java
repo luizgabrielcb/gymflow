@@ -66,6 +66,16 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(defaultErrorMessage);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<DefaultErrorMessage> handleUnauthorizedException(UnauthorizedException e) {
+        var defaultErrorMessage = DefaultErrorMessage.builder()
+                .message(e.getReason())
+                .status(e.getStatusCode().value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(defaultErrorMessage);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<DefaultErrorMessage> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         var defaultErrorMessage = DefaultErrorMessage.builder()

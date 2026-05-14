@@ -48,7 +48,8 @@ public class PhysicalAssessmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(physicalAssessmentPostResponse);
     }
 
-    @Operation(summary = "Get all assessments from authenticated user")
+    @Operation(summary = "Get all assessments from authenticated user",
+            description = "Use `page` and `size` for pagination. Ignore the `sort` parameter.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Assessments retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -80,7 +81,8 @@ public class PhysicalAssessmentController {
         return ResponseEntity.ok(physicalAssessmentGetResponse);
     }
 
-    @Operation(summary = "Get all assessments by user ID")
+    @Operation(summary = "Get all assessments by user ID",
+            description = "Use `page` and `size` for pagination. Ignore the `sort` parameter.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Assessments retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),

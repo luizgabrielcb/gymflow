@@ -47,7 +47,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void startSession_ReturnsCreated_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var workout = workoutRepository.findByNameIgnoreCase("Upper Body")
                 .orElseThrow(() -> new NotFoundException("Workout not found"));
@@ -70,7 +70,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void startSession_ReturnsBadRequest_WhenActiveSessionAlreadyExists() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/post-response-training-session-active-session-400.json");
 
@@ -111,7 +111,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-another-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void startSession_ReturnsForbidden_WhenWorkoutNotOwner() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/post-response-training-session-403.json");
 
@@ -134,7 +134,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("POST v1/training-sessions returns 404 not found when workout not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void startSession_ReturnsNotFound_WhenWorkoutNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
         var response = fileUtils.readResourceFile("training-session/post-response-training-session-workout-not-found-404.json");
 
         RestAssured.given()
@@ -157,7 +157,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsCreated_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set.json");
 
@@ -189,7 +189,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsBadRequest_WhenFieldsAreInvalid() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set-invalid-fields.json");
         var response = fileUtils.readResourceFile("training-session/post-response-session-set-invalid-fields-400.json");
@@ -220,7 +220,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-completed-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsBadRequest_WhenSessionIsNotInProgress() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set.json");
         var response = fileUtils.readResourceFile("training-session/post-response-session-set-not-in-progress-400.json");
@@ -256,7 +256,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-session-set.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsBadRequest_WhenDuplicateSet() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set.json");
         var response = fileUtils.readResourceFile("training-session/post-response-session-set-duplicate-400.json");
@@ -291,7 +291,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsBadRequest_WhenExerciseNotPartOfWorkout() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set.json");
 
@@ -344,7 +344,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsForbidden_WhenNotOwner() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set.json");
         var response = fileUtils.readResourceFile("training-session/post-response-session-set-403.json");
@@ -376,7 +376,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void addSet_ReturnsNotFound_WhenSessionNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("training-session/post-request-session-set.json");
         var response = fileUtils.readResourceFile("training-session/post-response-session-set-not-found-404.json");
@@ -403,7 +403,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void finishTrainingSession_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -433,7 +433,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-completed-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void finishTrainingSession_ReturnsBadRequest_WhenSessionIsNotInProgress() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/patch-response-finish-not-in-progress-400.json");
 
@@ -478,7 +478,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void finishTrainingSession_ReturnsForbidden_WhenNotOwner() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/patch-response-finish-403.json");
 
@@ -504,7 +504,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PATCH v1/training-sessions/{id}/finish returns 404 not found when session not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void finishTrainingSession_ReturnsNotFound_WhenSessionNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/patch-response-finish-not-found-404.json");
 
@@ -526,7 +526,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void cancelTrainingSession_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -556,7 +556,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-completed-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void cancelTrainingSession_ReturnsBadRequest_WhenSessionIsNotInProgress() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/patch-response-cancel-not-in-progress-400.json");
 
@@ -601,7 +601,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void cancelTrainingSession_ReturnsForbidden_WhenNotOwner() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/patch-response-cancel-403.json");
 
@@ -627,7 +627,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PATCH v1/training-sessions/{id}/cancel returns 404 not found when session not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void cancelTrainingSession_ReturnsNotFound_WhenSessionNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/patch-response-cancel-not-found-404.json");
 
@@ -649,7 +649,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsPageWithAllTrainingSessions_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/get-response-training-session-list-200.json");
 
@@ -673,7 +673,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/training-sessions returns empty page when no sessions found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsEmptyPage_WhenNoSessionsFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var body = RestAssured.given()
                 .header("Authorization", "Bearer " + token)
@@ -711,7 +711,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findCurrentTrainingSession_ReturnsCurrentSession_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/get-response-current-training-session-200.json");
 
@@ -749,7 +749,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/training-sessions/current returns 404 not found when no active session")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findCurrentTrainingSession_ReturnsNotFound_WhenNoActiveSession() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/get-response-current-training-session-not-found-404.json");
 
@@ -770,7 +770,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsTrainingSession_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/get-response-training-session-by-id-200.json");
 
@@ -819,7 +819,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsForbidden_WhenNotOwner() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/get-response-training-session-by-id-403.json");
 
@@ -845,7 +845,7 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/training-sessions/{id} returns 404 not found when session not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsNotFound_WhenSessionNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("training-session/get-response-training-session-by-id-not-found-404.json");
 

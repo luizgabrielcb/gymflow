@@ -46,7 +46,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsCreatedWorkout_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/post-request-workout.json");
         var response = fileUtils.readResourceFile("workout/post-response-workout-201.json");
@@ -76,7 +76,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsBadRequest_WhenFieldsAreBlank() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/post-request-workout-blank-fields.json");
         var response = fileUtils.readResourceFile("workout/post-response-workout-blank-fields-400.json");
@@ -103,7 +103,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsBadRequest_WhenWorkoutNameAlreadyExists() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/post-request-workout.json");
         var response = fileUtils.readResourceFile("workout/post-response-workout-name-already-exists-400.json");
@@ -146,7 +146,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsPageWithAllWorkouts_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("workout/get-response-workout-200.json");
 
@@ -170,7 +170,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/workouts returns an empty page when workout not found status code 200")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsEmptyPage_WhenWorkoutNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var body = RestAssured.given()
                 .header("Authorization", "Bearer " + token)
@@ -208,7 +208,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/put-request-workout.json");
 
@@ -241,7 +241,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PUT v1/workouts returns 400 bad request when invalid data")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsBadRequest_WhenInvalidData() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/put-request-workout-invalid-data.json");
         var response = fileUtils.readResourceFile("workout/put-response-workout-invalid-data-400.json");
@@ -264,7 +264,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/workout/insert-two-workouts.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-squat-legs.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsBadRequest_WhenWorkoutNameAlreadyExistsForUser() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/put-request-workout-name-already-exists.json");
         var response = fileUtils.readResourceFile("workout/put-response-workout-name-already-exists-400.json");
@@ -310,7 +310,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/exercise/insert-exercise-squat-legs.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNotFound_WhenWorkoutNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("workout/put-request-workout-with-id-9999.json");
         var response = fileUtils.readResourceFile("workout/put-response-workout-not-found-404.json");
@@ -336,7 +336,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var workout = workoutRepository.findByNameIgnoreCase("Upper Body")
                 .orElseThrow(() -> new NotFoundException("Workout not found"));
@@ -380,7 +380,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-another-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsForbidden_WhenNotOwner() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("workout/delete-response-workout-403.json");
 
@@ -403,7 +403,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("DELETE v1/workouts/{id} returns 404 not found when workout not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNotFound_WhenWorkoutNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("workout/delete-response-workout-not-found-404.json");
 

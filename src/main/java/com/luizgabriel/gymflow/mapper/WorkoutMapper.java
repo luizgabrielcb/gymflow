@@ -5,12 +5,9 @@ import com.luizgabriel.gymflow.domain.WorkoutExercise;
 import com.luizgabriel.gymflow.dto.response.WorkoutExerciseResponse;
 import com.luizgabriel.gymflow.dto.response.WorkoutGetResponse;
 import com.luizgabriel.gymflow.dto.response.WorkoutPostResponse;
-import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-
-import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface WorkoutMapper {
@@ -25,7 +22,4 @@ public interface WorkoutMapper {
 
     @Mapping(target = "exercises", source = "workoutExercises")
     WorkoutGetResponse toWorkoutGetResponse(Workout workout);
-
-    @IterableMapping(elementTargetType = WorkoutGetResponse.class)
-    List<WorkoutGetResponse> toWorkoutGetResponseList(List<Workout> workoutList);
 }

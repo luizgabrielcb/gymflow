@@ -10,11 +10,12 @@ import com.luizgabriel.gymflow.repository.TrainingSessionRepository;
 import com.luizgabriel.gymflow.repository.WorkoutExerciseRepository;
 import com.luizgabriel.gymflow.repository.WorkoutRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -95,8 +96,8 @@ public class TrainingSessionService {
         trainingSessionRepository.save(trainingSession);
     }
 
-    public List<TrainingSession> findAll(User user) {
-        return trainingSessionRepository.findAllByUserId(user.getId());
+    public Page<TrainingSession> findAll(Pageable pageable, User user) {
+        return trainingSessionRepository.findAllByUserId(pageable, user.getId());
     }
 
     public TrainingSession findCurrentTrainingSession(User user) {

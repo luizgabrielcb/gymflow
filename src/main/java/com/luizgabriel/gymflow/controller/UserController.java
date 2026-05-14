@@ -11,11 +11,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("v1/users")
@@ -33,12 +35,13 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     @GetMapping
-    public ResponseEntity<List<UserGetResponse>> findAllUsers() {
-        var userList = service.findAll();
+    public ResponseEntity<Page<UserGetResponse>> findAllUsers(@PageableDefault(sort = "name", direction = Sort.Direction.ASC)
+                                                              Pageable pageable) {
+        var usersPage = service.findAll(pageable);
 
-        var userGetResponseList = mapper.toUserGetResponseList(userList);
+        var userGetResponsePage = usersPage.map(mapper::toUserGetResponse);
 
-        return ResponseEntity.ok(userGetResponseList);
+        return ResponseEntity.ok(userGetResponsePage);
     }
 
     @Operation(summary = "Get user by ID")

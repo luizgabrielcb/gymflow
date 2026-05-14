@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.SqlMergeMode;
 @Sql(value = "/sql/user/delete-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class UserControllerTestIT extends AuthenticatedIntegrationConfig {
+
     private static final String URL = "/users";
 
     @Autowired
@@ -32,10 +33,10 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     private FileUtils fileUtils;
 
     @Test
-    @DisplayName("GET v1/users returns a list with all users when successful status code 200")
+    @DisplayName("GET v1/users returns a page with all users when successful status code 200")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsListWithAllUsers_WhenSuccessful() {
+    void findAll_ReturnsPageWithAllUsers_WhenSuccessful() {
         var token = loginAsAdmin();
 
         var response = fileUtils.readResourceFile("user/get-response-two-users-200.json");
@@ -50,9 +51,9 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
                 .log().all()
                 .extract().body().asString();
 
-        JsonAssertions
-                .assertThatJson(body)
-                .whenIgnoringPaths("[*].id")
+        JsonAssertions.assertThatJson(body)
+                .whenIgnoringPaths("content[*].id")
+                .node("content")
                 .isEqualTo(response);
     }
 

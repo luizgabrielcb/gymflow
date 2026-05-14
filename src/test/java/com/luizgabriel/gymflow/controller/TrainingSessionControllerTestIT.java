@@ -644,11 +644,11 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
     }
 
     @Test
-    @DisplayName("GET v1/training-sessions returns a list with all training sessions when successful")
+    @DisplayName("GET v1/training-sessions returns a page with all training sessions when successful")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsListWithAllTrainingSessions_WhenSuccessful() {
+    void findAll_ReturnsPageWithAllTrainingSessions_WhenSuccessful() {
         var token = loginAsUser();
 
         var response = fileUtils.readResourceFile("training-session/get-response-training-session-list-200.json");
@@ -664,27 +664,30 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
                 .extract().body().asString();
 
         JsonAssertions.assertThatJson(body)
-                .whenIgnoringPaths("[*].id", "[*].startedAt", "[*].finishedAt", "[*].sets[*].id")
+                .whenIgnoringPaths("content[*].id", "content[0].startedAt")
+                .node("content")
                 .isEqualTo(response);
     }
 
     @Test
-    @DisplayName("GET v1/training-sessions returns empty list when no sessions found")
+    @DisplayName("GET v1/training-sessions returns empty page when no sessions found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    void findAll_ReturnsEmptyList_WhenNoSessionsFound() {
+    void findAll_ReturnsEmptyPage_WhenNoSessionsFound() {
         var token = loginAsUser();
 
-        var response = fileUtils.readResourceFile("training-session/get-response-training-session-empty-list-200.json");
-
-        RestAssured.given()
+        var body = RestAssured.given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .when()
                 .get(URL)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body(Matchers.equalTo(response))
-                .log().all();
+                .log().all()
+                .extract().body().asString();
+
+        JsonAssertions.assertThatJson(body)
+                .node("content")
+                .isEqualTo("[]");
     }
 
     @Test

@@ -8,9 +8,9 @@ import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.PhysicalAssessmentRepository;
 import com.luizgabriel.gymflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +32,14 @@ public class PhysicalAssessmentService {
         return assessmentRepository.save(physicalAssessment);
     }
 
-    public List<PhysicalAssessment> findByAuthenticatedUser(User user) {
-        return assessmentRepository.findByUserId(user.getId());
+    public Page<PhysicalAssessment> findByAuthenticatedUser(Pageable pageable, User user) {
+        return assessmentRepository.findByUserId(pageable, user.getId());
     }
 
-    public List<PhysicalAssessment> findUserAssessmentByUserId(Long id) {
+    public Page<PhysicalAssessment> findUserAssessmentByUserId(Pageable pageable, Long id) {
         findUserOrThrowNotFound(id);
 
-        return assessmentRepository.findByUserId(id);
+        return assessmentRepository.findByUserId(pageable, id);
     }
 
     public PhysicalAssessment findById(Long id) {

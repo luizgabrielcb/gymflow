@@ -1,10 +1,7 @@
 package com.luizgabriel.gymflow.service;
 
 import com.luizgabriel.gymflow.commons.TrainingSessionUtils;
-import com.luizgabriel.gymflow.domain.SessionSet;
-import com.luizgabriel.gymflow.domain.Status;
-import com.luizgabriel.gymflow.domain.TrainingSession;
-import com.luizgabriel.gymflow.domain.User;
+import com.luizgabriel.gymflow.domain.*;
 import com.luizgabriel.gymflow.exception.BadRequestException;
 import com.luizgabriel.gymflow.exception.ForbiddenException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
@@ -18,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -366,28 +366,35 @@ class TrainingSessionServiceTest {
     }
 
     @Test
-    @DisplayName("findAll returns a list with all training sessions by user id when successful")
-    void findAll_ReturnsListWithAllTrainingSessionsByUserId_WhenSuccessful() {
+    @DisplayName("findAll returns a page with all training sessions by user id when successful")
+    void findAll_ReturnsPageWithAllTrainingSessionsByUserId_WhenSuccessful() {
         var trainingSession = utils.newTrainingSession();
-        var trainingSessionListExpected = Collections.singletonList(trainingSession);
 
-        BDDMockito.when(trainingSessionRepository.findAllByUserId(trainingSession.getUser().getId()))
-                .thenReturn(trainingSessionListExpected);
+        var trainingSessionPage = new PageImpl<>(Collections.singletonList(trainingSession));
 
-        var trainingSessionList = service.findAll(trainingSession.getUser());
+        var pageable = PageRequest.of(0, 1);
 
-        Assertions.assertThat(trainingSessionList).isNotNull().isEqualTo(trainingSessionListExpected).hasSize(1);
+        BDDMockito.when(trainingSessionRepository.findAllByUserId(pageable, trainingSession.getUser().getId()))
+                .thenReturn(trainingSessionPage);
+
+        var trainingSessionList = service.findAll(pageable, trainingSession.getUser());
+
+        Assertions.assertThat(trainingSessionList).isNotNull().isEqualTo(trainingSessionPage);
     }
 
     @Test
-    @DisplayName("findAll returns a empty list when user does not have training session")
-    void findAll_ReturnsEmptyList_WhenUserDoesNotHaveTrainingSession() {
+    @DisplayName("findAll returns a empty page when user does not have training session")
+    void findAll_ReturnsEmptyPage_WhenUserDoesNotHaveTrainingSession() {
         var user = User.builder().id(99L).build();
 
-        BDDMockito.when(trainingSessionRepository.findAllByUserId(user.getId()))
-                .thenReturn(Collections.emptyList());
+        var pageable = PageRequest.of(0, 1);
 
-        var trainingSessionList = service.findAll(user);
+        Page<TrainingSession> emptyPage = Page.empty();
+
+        BDDMockito.when(trainingSessionRepository.findAllByUserId(pageable, user.getId()))
+                .thenReturn(emptyPage);
+
+        var trainingSessionList = service.findAll(pageable, user);
 
         Assertions.assertThat(trainingSessionList).isNotNull().isEmpty();
     }

@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -63,47 +66,59 @@ class PhysicalAssessmentServiceTest {
     }
 
     @Test
-    @DisplayName("findByAuthenticatedUser returns a list with all physical assessments when successful")
-    void findByAuthenticatedUser_ReturnsListWithAllPhysicalAssessment_WhenSuccessful() {
+    @DisplayName("findByAuthenticatedUser returns a page with all physical assessments when successful")
+    void findByAuthenticatedUser_ReturnsPageWithAllPhysicalAssessment_WhenSuccessful() {
         var physicalAssessment = utils.newPhysicalAssessment();
         var user = utils.newUser();
 
-        BDDMockito.when(assessmentRepository.findByUserId(user.getId()))
-                .thenReturn(Collections.singletonList(physicalAssessment));
+        var physicalAssessmentPage = new PageImpl<>(Collections.singletonList(physicalAssessment));
 
-        var assessmentsByAuthenticatedUser = service.findByAuthenticatedUser(user);
+        var pageable = PageRequest.of(0, 1);
 
-        Assertions.assertThat(assessmentsByAuthenticatedUser).isNotNull().isEqualTo(Collections.singletonList(physicalAssessment));
+        BDDMockito.when(assessmentRepository.findByUserId(pageable, user.getId()))
+                .thenReturn(physicalAssessmentPage);
+
+        var assessmentsByAuthenticatedUser = service.findByAuthenticatedUser(pageable, user);
+
+        Assertions.assertThat(assessmentsByAuthenticatedUser).isNotNull().isEqualTo(physicalAssessmentPage);
     }
 
     @Test
-    @DisplayName("findByAuthenticatedUser returns a empty list when physical assessment not found")
-    void findByAuthenticatedUser_ReturnsEmptyList_WhenPhysicalAssessmentNotFound() {
+    @DisplayName("findByAuthenticatedUser returns a empty page when physical assessment not found")
+    void findByAuthenticatedUser_ReturnsEmptyPage_WhenPhysicalAssessmentNotFound() {
         var user = utils.newUser();
 
-        BDDMockito.when(assessmentRepository.findByUserId(user.getId()))
-                .thenReturn(Collections.emptyList());
+        var pageable = PageRequest.of(0, 1);
 
-        var assessmentsByAuthenticatedUser = service.findByAuthenticatedUser(user);
+        Page<PhysicalAssessment> emptyPage = Page.empty();
+
+        BDDMockito.when(assessmentRepository.findByUserId(pageable, user.getId()))
+                .thenReturn(emptyPage);
+
+        var assessmentsByAuthenticatedUser = service.findByAuthenticatedUser(pageable, user);
 
         Assertions.assertThat(assessmentsByAuthenticatedUser).isNotNull().isEmpty();
     }
 
     @Test
-    @DisplayName("findUserAssessmentByUserId returns a list with all physical assessments when successful")
-    void findUserAssessmentByUserId_ReturnsListWithAllPhysicalAssessment_WhenSuccessful() {
+    @DisplayName("findUserAssessmentByUserId returns a page with all physical assessments when successful")
+    void findUserAssessmentByUserId_ReturnsPageWithAllPhysicalAssessment_WhenSuccessful() {
         var user = utils.newUser();
         var physicalAssessment = utils.newPhysicalAssessment();
+
+        var physicalAssessmentPage = new PageImpl<>(Collections.singletonList(physicalAssessment));
+
+        var pageable = PageRequest.of(0, 1);
 
         BDDMockito.when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
 
-        BDDMockito.when(assessmentRepository.findByUserId(user.getId()))
-                .thenReturn(Collections.singletonList(physicalAssessment));
+        BDDMockito.when(assessmentRepository.findByUserId(pageable, user.getId()))
+                .thenReturn(physicalAssessmentPage);
 
-        var assessmentsByUserId = service.findUserAssessmentByUserId(user.getId());
+        var assessmentsByUserId = service.findUserAssessmentByUserId(pageable, user.getId());
 
-        Assertions.assertThat(assessmentsByUserId).isNotNull().isEqualTo(Collections.singletonList(physicalAssessment));
+        Assertions.assertThat(assessmentsByUserId).isNotNull().isEqualTo(physicalAssessmentPage);
     }
 
     @Test
@@ -111,25 +126,31 @@ class PhysicalAssessmentServiceTest {
     void findUserAssessmentByUserId_ThrowsNotFoundException_WhenUserNotFound() {
         var user = utils.newUser();
 
+        var pageable = PageRequest.of(0, 1);
+
         BDDMockito.when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> service.findUserAssessmentByUserId(user.getId()))
+        Assertions.assertThatThrownBy(() -> service.findUserAssessmentByUserId(pageable, user.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @DisplayName("findUserAssessmentByUserId returns empty list when physical assessment not found")
-    void findUserAssessmentByUserId_ReturnsEmptyList_WhenPhysicalAssessmentNotFound() {
+    @DisplayName("findUserAssessmentByUserId returns empty page when physical assessment not found")
+    void findUserAssessmentByUserId_ReturnsEmptyPage_WhenPhysicalAssessmentNotFound() {
         var user = utils.newUser();
+
+        var pageable = PageRequest.of(0, 1);
+
+        Page<PhysicalAssessment> emptyPage = Page.empty();
 
         BDDMockito.when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
 
-        BDDMockito.when(assessmentRepository.findByUserId(user.getId()))
-                .thenReturn(Collections.emptyList());
+        BDDMockito.when(assessmentRepository.findByUserId(pageable, user.getId()))
+                .thenReturn(emptyPage);
 
-        var userAssessmentByUserId = service.findUserAssessmentByUserId(user.getId());
+        var userAssessmentByUserId = service.findUserAssessmentByUserId(pageable, user.getId());
 
         Assertions.assertThat(userAssessmentByUserId).isNotNull().isEmpty();
     }

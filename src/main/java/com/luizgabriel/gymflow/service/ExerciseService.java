@@ -5,9 +5,9 @@ import com.luizgabriel.gymflow.dto.request.ExercisePutRequest;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.ExerciseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +19,8 @@ public class ExerciseService {
         return repository.save(exercise);
     }
 
-    public List<Exercise> findAll() {
-        return repository.findAll();
+    public Page<Exercise> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     public Exercise findById(Long id) {

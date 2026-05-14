@@ -13,12 +13,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("v1/physical-assessments")
@@ -52,12 +54,14 @@ public class PhysicalAssessmentController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<List<PhysicalAssessmentGetResponse>> findByAuthenticatedUser(@AuthenticationPrincipal User user) {
-        var physicalAssessmentsList = service.findByAuthenticatedUser(user);
+    public ResponseEntity<Page<PhysicalAssessmentGetResponse>> findByAuthenticatedUser(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                                       Pageable pageable,
+                                                                                       @AuthenticationPrincipal User user) {
+        var physicalAssessmentsPage = service.findByAuthenticatedUser(pageable, user);
 
-        var physicalAssessmentGetResponseList = mapper.toPhysicalAssessmentGetResponseList(physicalAssessmentsList);
+        var physicalAssessmentGetResponsePage = physicalAssessmentsPage.map(mapper::toPhysicalAssessmentGetResponse);
 
-        return ResponseEntity.ok(physicalAssessmentGetResponseList);
+        return ResponseEntity.ok(physicalAssessmentGetResponsePage);
     }
 
     @Operation(summary = "Get physical assessment by ID")
@@ -84,12 +88,14 @@ public class PhysicalAssessmentController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("user/{id}")
-    public ResponseEntity<List<PhysicalAssessmentGetResponse>> findUserAssessmentByUserId(@PathVariable Long id) {
-        var physicalAssessments = service.findUserAssessmentByUserId(id);
+    public ResponseEntity<Page<PhysicalAssessmentGetResponse>> findUserAssessmentByUserId(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                                          Pageable pageable,
+                                                                                          @PathVariable Long id) {
+        var physicalAssessmentsPage = service.findUserAssessmentByUserId(pageable, id);
 
-        var physicalAssessmentGetResponseList = mapper.toPhysicalAssessmentGetResponseList(physicalAssessments);
+        var physicalAssessmentGetResponsePage = physicalAssessmentsPage.map(mapper::toPhysicalAssessmentGetResponse);
 
-        return ResponseEntity.ok(physicalAssessmentGetResponseList);
+        return ResponseEntity.ok(physicalAssessmentGetResponsePage);
     }
 
     @Operation(summary = "Update a physical assessment")

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
@@ -31,25 +34,31 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Test
-    @DisplayName("findAll returns a list with all users when successful")
-    void findAll_ReturnsListWithAllUsers_WhenSuccessful() {
+    @DisplayName("findAll returns a page with all users when successful")
+    void findAll_ReturnsPageWithAllUsers_WhenSuccessful() {
         var user = utils.newUser();
 
-        var userSingletonList = Collections.singletonList(user);
+        var userPage = new PageImpl<>(Collections.singletonList(user));
 
-        BDDMockito.when(repository.findAll()).thenReturn(userSingletonList);
+        var pageable = PageRequest.of(0, 1);
 
-        var userList = service.findAll();
+        BDDMockito.when(repository.findAll(pageable)).thenReturn(userPage);
 
-        Assertions.assertThat(userList).isNotNull().isEqualTo(userSingletonList);
+        var userList = service.findAll(pageable);
+
+        Assertions.assertThat(userList).isNotNull().isEqualTo(userPage);
     }
 
     @Test
-    @DisplayName("findAll returns a empty list when user not found")
-    void findAll_ReturnsEmptyList_WhenUserNotFound() {
-        BDDMockito.when(repository.findAll()).thenReturn(Collections.emptyList());
+    @DisplayName("findAll returns a empty page when user not found")
+    void findAll_ReturnsEmptyPage_WhenUserNotFound() {
+        var pageable = PageRequest.of(0, 1);
 
-        var userList = service.findAll();
+        Page<User> emptyPage = Page.empty();
+
+        BDDMockito.when(repository.findAll(pageable)).thenReturn(emptyPage);
+
+        var userList = service.findAll(pageable);
 
         Assertions.assertThat(userList).isNotNull().isEmpty();
     }

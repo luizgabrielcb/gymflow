@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,29 +74,35 @@ class WorkoutServiceTest {
     }
 
     @Test
-    @DisplayName("findAll returns a list with all workouts by user id when successful")
-    void findAll_ReturnsListWithAllWorkoutsByUserId_WhenSuccessful() {
+    @DisplayName("findAll returns a page with all workouts by user id when successful")
+    void findAll_ReturnsPageWithAllWorkoutsByUserId_WhenSuccessful() {
         var workout = utils.newWorkout();
 
-        var workoutList = Collections.singletonList(workout);
+        var workoutPage = new PageImpl<>(Collections.singletonList(workout));
 
-        BDDMockito.when(workoutRepository.findAllByUserId(workout.getUser().getId()))
-                .thenReturn(workoutList);
+        var pageable = PageRequest.of(0, 1);
 
-        var workouts = service.findAll(workout.getUser());
+        BDDMockito.when(workoutRepository.findAllByUserId(workout.getUser().getId(), pageable))
+                .thenReturn(workoutPage);
 
-        Assertions.assertThat(workouts).isNotNull().isEqualTo(workoutList);
+        var workouts = service.findAll(pageable, workout.getUser());
+
+        Assertions.assertThat(workouts).isNotNull().isEqualTo(workoutPage);
     }
 
     @Test
-    @DisplayName("findAll returns a empty list when user does not have workouts")
-    void findAll_ReturnsEmptyList_WhenUserDoesNotHaveWorkouts() {
+    @DisplayName("findAll returns an empty page when user does not have workouts")
+    void findAll_ReturnsEmptyPage_WhenUserDoesNotHaveWorkouts() {
         var user = User.builder().id(99L).build();
 
-        BDDMockito.when(workoutRepository.findAllByUserId(user.getId()))
-                .thenReturn(Collections.emptyList());
+        var pageable = PageRequest.of(0, 1);
 
-        var workouts = service.findAll(user);
+        Page<Workout> emptyPage = Page.empty();
+
+        BDDMockito.when(workoutRepository.findAllByUserId(user.getId(), pageable))
+                .thenReturn(emptyPage);
+
+        var workouts = service.findAll(pageable, user);
 
         Assertions.assertThat(workouts).isNotNull().isEmpty();
     }

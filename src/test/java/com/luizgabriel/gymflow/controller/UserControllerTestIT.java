@@ -37,7 +37,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsPageWithAllUsers_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("user/get-response-two-users-200.json");
 
@@ -76,7 +76,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/users returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("user/get-response-user-403.json");
 
@@ -95,7 +95,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/users/{id} returns an user by id when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsListWithAllUsers_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("user/get-response-one-user-200.json");
 
@@ -138,7 +138,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/users/{id} returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("user/get-response-user-403.json");
 
@@ -158,7 +158,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/users/me returns authenticated user when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findMe_ReturnsAuthenticatedUser_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("user/get-response-one-user-200.json");
 
@@ -197,7 +197,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PUT v1/users returns 204 no content when successful")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("user/put-request-user.json");
 
@@ -224,7 +224,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsBadRequest_WhenEmailAlreadyExists() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("user/put-request-user-email-already-exists.json");
         var response = fileUtils.readResourceFile("user/put-response-user-email-already-exists-400.json");
@@ -245,7 +245,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PUT v1/users returns 400 bad request when fields are blank")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsBadRequest_WhenFieldsAreBlank() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("user/put-request-user-email-blank-fields.json");
         var response = fileUtils.readResourceFile("user/put-response-user-blank-fields-400.json");
@@ -284,7 +284,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var user = userRepository.findByNameIgnoreCase("User Test");
 
@@ -322,7 +322,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("DELETE v1/users returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("user/delete-response-user-403.json");
 
@@ -342,7 +342,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("DELETE v1/users returns 404 not found when user not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNotFound_WhenUserNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("user/delete-response-user-404.json");
 
@@ -362,7 +362,7 @@ class UserControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("DELETE v1/users/me returns 204 no content when successful")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void deleteMe_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var user = userRepository.findByNameIgnoreCase("User Test");
 

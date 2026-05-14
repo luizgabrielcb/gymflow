@@ -42,7 +42,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("POST v1/physical-assessments returns 201 created assessment id when successful")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsCreatedAssessmentId_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("assessment/post-request-assessment.json");
 
@@ -67,7 +67,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("POST v1/physical-assessments returns 400 bad request when fields are null")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsBadRequest_WhenFieldsAreNull() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("assessment/post-request-assessment-null-fields.json");
         var response = fileUtils.readResourceFile("assessment/post-response-assessment-null-fields-400.json");
@@ -105,7 +105,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("POST v1/physical-assessments returns 403 forbidden when not authenticated")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("assessment/post-request-assessment-with-id-9999.json");
         var response = fileUtils.readResourceFile("assessment/post-response-assessment-403.json");
@@ -126,7 +126,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("POST v1/physical-assessments returns 404 not found when user not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsNotFound_WhenUserNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("assessment/post-request-assessment-user-not-found.json");
         var response = fileUtils.readResourceFile("assessment/post-response-assessment-404.json");
@@ -147,7 +147,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments returns a page with all assessments by authenticated user when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findByAuthenticatedUser_ReturnsPageWithAllAssessments_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         createAssessmentForUser(token, "admin.test@gmail.com");
 
@@ -173,7 +173,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments returns an empty page when assessments not found status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findByAuthenticatedUser_ReturnsEmptyPage_WhenAssessmentsNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var body = RestAssured.given()
                 .contentType(ContentType.JSON)
@@ -209,7 +209,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/{id} returns an assessment by id when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsAssessmentById_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var assessmentId = createAssessmentForUser(token, "admin.test@gmail.com");
 
@@ -251,7 +251,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/{id} returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("assessment/get-response-assessment-403.json");
 
@@ -271,7 +271,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/{id} returns 404 not found when assessment not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsNotFound_WhenAssessmentNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("assessment/get-response-assessment-404.json");
 
@@ -291,7 +291,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/user/{id} returns a page with all assessments by user id when successful status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findUserAssessmentByUserId_ReturnsPageWithAllAssessments_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         createAssessmentForUser(token, "admin.test@gmail.com");
 
@@ -321,7 +321,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/user/{id} returns an empty page when user does not have assessments status code 200")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findUserAssessmentByUserId_ReturnsEmptyPage_WhenUserDoesNotHaveAssessments() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var user = userRepository.findByEmailIgnoreCase("admin.test@gmail.com")
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -362,7 +362,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/user/{id} returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findUserAssessmentByUserId_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("assessment/get-response-assessment-403.json");
 
@@ -382,7 +382,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("GET v1/physical-assessments/user/{id} returns 404 not found when user assessment not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findUserAssessmentByUserId_ReturnsNotFound_WhenUserAssessmentNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("assessment/get-response-user-assessment-404.json");
 
@@ -402,7 +402,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("PUT v1/physical-assessments returns 204 no content when successful")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var assessmentId = createAssessmentForUser(token, "admin.test@gmail.com");
 
@@ -445,7 +445,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("PUT v1/physical-assessments returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("assessment/put-response-assessment-403.json");
 
@@ -464,7 +464,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("PUT v1/physical-assessments returns 404 not found when assessment not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNotFound_WhenAssessmentNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("assessment/put-request-assessment-with-id-9999.json");
         var response = fileUtils.readResourceFile("assessment/put-response-assessment-404.json");
@@ -485,7 +485,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("DELETE v1/physical-assessments/{id} returns 204 no content when successful")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var assessmentId = createAssessmentForUser(token, "admin.test@gmail.com");
 
@@ -523,7 +523,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("DELETE v1/physical-assessments/{id} returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("assessment/delete-response-assessment-403.json");
 
@@ -543,7 +543,7 @@ class PhysicalAssessmentControllerTestIT extends AuthenticatedIntegrationConfig 
     @DisplayName("DELETE v1/physical-assessments/{id} returns 404 not found when assessment not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNotFound_WhenAssessmentNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("assessment/delete-response-assessment-404.json");
 

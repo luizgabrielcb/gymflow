@@ -37,7 +37,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("POST v1/exercises returns created exercise id when successful")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsCreatedExerciseId_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("exercise/post-request-exercise.json");
 
@@ -57,7 +57,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("POST v1/exercises returns 400 bad request when fields are blank")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsBadRequest_WhenFieldsAreBlank() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("exercise/post-request-exercise-blank-fields.json");
         var response = fileUtils.readResourceFile("exercise/post-response-exercise-blank-fields-400.json");
@@ -95,7 +95,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("POST v1/exercises returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("exercise/post-request-exercise.json");
         var response = fileUtils.readResourceFile("exercise/post-response-exercise-403.json");
@@ -117,7 +117,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsPageWithAllExercises_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("exercise/get-response-two-exercises-200.json");
 
@@ -141,7 +141,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/exercises returns an empty page when exercises not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsEmptyPage_WhenExercisesNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var body = RestAssured.given()
                 .contentType(ContentType.JSON)
@@ -178,7 +178,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsExercise_WhenSuccessful() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("exercise/get-response-one-exercise-200.json");
 
@@ -220,7 +220,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("GET v1/exercises/{id} returns 404 not found when exercise not found")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsNotFound_WhenExerciseNotFound() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("exercise/get-response-exercise-404.json");
 
@@ -241,7 +241,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("exercise/put-request-exercise.json");
 
@@ -269,7 +269,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PUT v1/exercises returns 400 bad request when fields are blank and id null")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsBadRequest_WhenFieldsAreBlankAndIdNull() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("exercise/put-request-exercise-blank-fields-and-id-null.json");
         var response = fileUtils.readResourceFile("exercise/put-response-exercise-blank-fields-and-id-null-400.json");
@@ -307,7 +307,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PUT v1/exercises returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var request = fileUtils.readResourceFile("exercise/put-request-exercise.json");
         var response = fileUtils.readResourceFile("exercise/put-response-exercise-403.json");
@@ -328,7 +328,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("PUT v1/exercises returns 404 not found when exercise not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNotFound_WhenExerciseNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var request = fileUtils.readResourceFile("exercise/put-request-exercise-with-id-99.json");
         var response = fileUtils.readResourceFile("exercise/put-response-exercise-404.json");
@@ -350,7 +350,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNoContent_WhenSuccessful() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var exercise = exerciseRepository.findByNameIgnoreCase("Bench Press");
 
@@ -388,7 +388,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("DELETE v1/exercises returns 403 forbidden when not authorized")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsForbidden_WhenNotAuthorized() {
-        var token = loginAsUser();
+        var token = loginAsUserToken();
 
         var response = fileUtils.readResourceFile("exercise/delete-response-exercise-403.json");
 
@@ -408,7 +408,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @DisplayName("DELETE v1/exercises returns 404 not found when exercise not found")
     @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNotFound_WhenExerciseNotFound() {
-        var token = loginAsAdmin();
+        var token = loginAsAdminToken();
 
         var response = fileUtils.readResourceFile("exercise/delete-response-exercise-404.json");
 

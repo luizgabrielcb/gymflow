@@ -32,8 +32,10 @@ public class TrainingSessionController {
     @Operation(summary = "Start a new training session")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Training session started successfully"),
-            @ApiResponse(responseCode = "400", description = "Active session already exists or workout not found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "400", description = "Active session already exists"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Workout does not belong to authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Workout not found")
     })
     @PostMapping
     public ResponseEntity<TrainingSessionIdPostResponse> startSession(@RequestParam Long workoutId, @AuthenticationPrincipal User user) {
@@ -47,8 +49,9 @@ public class TrainingSessionController {
     @Operation(summary = "Add a set to a training session")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Set added successfully"),
-            @ApiResponse(responseCode = "400", description = "Session not in progress or duplicate set"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress, duplicate set, or exercise not part of workout"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
             @ApiResponse(responseCode = "404", description = "Session not found")
     })
     @PostMapping("{id}/sets")
@@ -67,6 +70,7 @@ public class TrainingSessionController {
             @ApiResponse(responseCode = "204", description = "Training session finished successfully"),
             @ApiResponse(responseCode = "400", description = "Session not in progress"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
             @ApiResponse(responseCode = "404", description = "Session not found")
     })
     @PatchMapping({"{id}/finish"})
@@ -81,6 +85,7 @@ public class TrainingSessionController {
             @ApiResponse(responseCode = "204", description = "Training session cancelled successfully"),
             @ApiResponse(responseCode = "400", description = "Session not in progress"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
             @ApiResponse(responseCode = "404", description = "Session not found")
     })
     @PatchMapping("{id}/cancel")
@@ -123,6 +128,7 @@ public class TrainingSessionController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Training session retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
             @ApiResponse(responseCode = "404", description = "Session not found")
     })
     @GetMapping("{id}")

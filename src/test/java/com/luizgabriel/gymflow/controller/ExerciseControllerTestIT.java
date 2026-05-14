@@ -15,7 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 
+@Sql(value = "/sql/user/delete-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     private static final String URL = "/exercises";
 
@@ -30,7 +34,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("POST v1/exercises returns created exercise id when successful")
-    @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsCreatedExerciseId_WhenSuccessful() {
         var token = loginAsAdmin();
 
@@ -50,6 +54,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("POST v1/exercises returns 400 bad request when fields are blank")
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsBadRequest_WhenFieldsAreBlank() {
         var token = loginAsAdmin();
 
@@ -87,6 +92,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("POST v1/exercises returns 403 forbidden when not authorized")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void save_ReturnsForbidden_WhenNotAuthorized() {
         var token = loginAsUser();
 
@@ -108,7 +114,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Test
     @DisplayName("GET v1/exercises returns a list with all exercises when successful")
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsListWithAllExercises_WhenSuccessful() {
         var token = loginAsUser();
 
@@ -131,6 +137,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("GET v1/exercises returns an empty list when exercises not found")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findAll_ReturnsEmptyList_WhenExercisesNotFound() {
         var token = loginAsUser();
 
@@ -165,7 +172,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Test
     @DisplayName("GET v1/exercises/{id} returns exercise by id when successful")
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsExercise_WhenSuccessful() {
         var token = loginAsUser();
 
@@ -207,6 +214,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("GET v1/exercises/{id} returns 404 not found when exercise not found")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findById_ReturnsNotFound_WhenExerciseNotFound() {
         var token = loginAsUser();
 
@@ -227,7 +235,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Test
     @DisplayName("PUT v1/exercises returns no content when successful")
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNoContent_WhenSuccessful() {
         var token = loginAsAdmin();
 
@@ -255,6 +263,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("PUT v1/exercises returns 400 bad request when fields are blank and id null")
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsBadRequest_WhenFieldsAreBlankAndIdNull() {
         var token = loginAsAdmin();
 
@@ -292,6 +301,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("PUT v1/exercises returns 403 forbidden when not authorized")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsForbidden_WhenNotAuthorized() {
         var token = loginAsUser();
 
@@ -312,6 +322,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("PUT v1/exercises returns 404 not found when exercise not found")
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void update_ReturnsNotFound_WhenExerciseNotFound() {
         var token = loginAsAdmin();
 
@@ -333,7 +344,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
     @Test
     @DisplayName("DELETE v1/exercises returns no content when successful")
     @Sql(value = "/sql/exercise/insert-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNoContent_WhenSuccessful() {
         var token = loginAsAdmin();
 
@@ -371,6 +382,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("DELETE v1/exercises returns 403 forbidden when not authorized")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsForbidden_WhenNotAuthorized() {
         var token = loginAsUser();
 
@@ -390,6 +402,7 @@ class ExerciseControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Test
     @DisplayName("DELETE v1/exercises returns 404 not found when exercise not found")
+    @Sql(value = "/sql/user/insert-admin-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void delete_ReturnsNotFound_WhenExerciseNotFound() {
         var token = loginAsAdmin();
 

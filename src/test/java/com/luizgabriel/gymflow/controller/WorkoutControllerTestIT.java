@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 
 @Sql(value = "/sql/user/delete-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     private static final String URL = "/workouts";
@@ -370,7 +371,7 @@ class WorkoutControllerTestIT extends AuthenticatedIntegrationConfig {
     }
 
     @Test
-    @DisplayName("DELETE v1/workouts/{id} returns 403 forbidden when not owner")
+    @DisplayName("DELETE v1/workouts/{id} returns 403 forbidden when workout does not belong to authenticated user")
     @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/user/insert-another-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)

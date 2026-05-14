@@ -3,6 +3,7 @@ package com.luizgabriel.gymflow.service;
 import com.luizgabriel.gymflow.domain.*;
 import com.luizgabriel.gymflow.dto.request.SessionSetPostRequest;
 import com.luizgabriel.gymflow.exception.BadRequestException;
+import com.luizgabriel.gymflow.exception.ForbiddenException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.SessionSetRepository;
 import com.luizgabriel.gymflow.repository.TrainingSessionRepository;
@@ -134,13 +135,13 @@ public class TrainingSessionService {
 
     private void validateWorkoutOwnership(Workout workout, User user) {
         if (!workout.getUser().getId().equals(user.getId())) {
-            throw new BadRequestException("You do not have permission to access this workout");
+            throw new ForbiddenException("You do not have permission to access this workout");
         }
     }
 
     private void validateTrainingSessionOwnership(TrainingSession trainingSession, User user) {
         if (!trainingSession.getUser().getId().equals(user.getId())) {
-            throw new BadRequestException("You do not have permission to access this training session");
+            throw new ForbiddenException("You do not have permission to access this training session");
         }
     }
 

@@ -6,6 +6,7 @@ import com.luizgabriel.gymflow.domain.Status;
 import com.luizgabriel.gymflow.domain.TrainingSession;
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.exception.BadRequestException;
+import com.luizgabriel.gymflow.exception.ForbiddenException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
 import com.luizgabriel.gymflow.repository.SessionSetRepository;
 import com.luizgabriel.gymflow.repository.TrainingSessionRepository;
@@ -112,7 +113,7 @@ class TrainingSessionServiceTest {
         BDDMockito.when(workoutRepository.findById(trainingSession.getWorkout().getId())).thenReturn(Optional.of(trainingSession.getWorkout()));
 
         Assertions.assertThatThrownBy(() -> service.startSession(trainingSession.getWorkout().getId(), anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         BDDMockito.then(trainingSessionRepository).should(Mockito.never()).save(ArgumentMatchers.any(TrainingSession.class));
     }
@@ -178,7 +179,7 @@ class TrainingSessionServiceTest {
 
         Assertions.assertThatThrownBy(() -> service.addSet
                         (trainingSessionInProgress.getId(), sessionSetPostRequest, anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         BDDMockito.then(sessionSetRepository).should(Mockito.never()).save(ArgumentMatchers.any(SessionSet.class));
     }
@@ -285,7 +286,7 @@ class TrainingSessionServiceTest {
                 .thenReturn(Optional.of(trainingSession));
 
         Assertions.assertThatThrownBy(() -> service.finishTrainingSession(trainingSession.getId(), anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         BDDMockito.then(trainingSessionRepository).should(Mockito.never()).save(ArgumentMatchers.any(TrainingSession.class));
     }
@@ -345,7 +346,7 @@ class TrainingSessionServiceTest {
                 .thenReturn(Optional.of(trainingSession));
 
         Assertions.assertThatThrownBy(() -> service.cancelTrainingSession(trainingSession.getId(), anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         BDDMockito.then(trainingSessionRepository).should(Mockito.never()).save(ArgumentMatchers.any(TrainingSession.class));
     }
@@ -451,6 +452,6 @@ class TrainingSessionServiceTest {
                 .thenReturn(Optional.of(trainingSession));
 
         Assertions.assertThatThrownBy(() -> service.findById(trainingSession.getId(), anotherUser))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ForbiddenException.class);
     }
 }

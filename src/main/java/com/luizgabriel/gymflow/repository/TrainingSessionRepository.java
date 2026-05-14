@@ -15,5 +15,9 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
     @EntityGraph(attributePaths = {"sets", "sets.exercise", "workout"})
     List<TrainingSession> findAllByUserId(Long userId);
 
+    @EntityGraph(attributePaths = {"sets", "sets.exercise", "workout"})
     Optional<TrainingSession> findByUserIdAndStatus(Long userId, Status status);
+
+    @EntityGraph(attributePaths = {"sets", "sets.exercise", "workout"})
+    Optional<TrainingSession> findById(Long id);
 }

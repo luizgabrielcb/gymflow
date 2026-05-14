@@ -47,7 +47,8 @@ public class WorkoutController {
         return ResponseEntity.status(HttpStatus.CREATED).body(workoutPostResponse);
     }
 
-    @Operation(summary = "Get all workouts from authenticated user")
+    @Operation(summary = "Get all workouts from authenticated user",
+            description = "Use `page` and `size` for pagination. Ignore the `sort` parameter.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Workouts retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")

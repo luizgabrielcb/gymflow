@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class TokenService {
@@ -40,5 +41,9 @@ public class TokenService {
 
     private Instant generateTokenExpiration() {
         return Instant.now().plus(Duration.ofHours(2));
+    }
+
+    public String generateRefreshToken() {
+        return UUID.randomUUID().toString();
     }
 }

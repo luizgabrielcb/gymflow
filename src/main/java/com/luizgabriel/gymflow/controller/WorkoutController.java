@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -54,7 +55,7 @@ public class WorkoutController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<Page<WorkoutGetResponse>> findAll(@PageableDefault(sort = "name", direction = Sort.Direction.ASC)
+    public ResponseEntity<Page<WorkoutGetResponse>> findAll(@ParameterObject @PageableDefault(sort = "name", direction = Sort.Direction.ASC)
                                                             Pageable pageable,
                                                             @AuthenticationPrincipal User user) {
         var workoutsPage = service.findAll(pageable, user);

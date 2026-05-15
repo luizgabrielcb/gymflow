@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -75,7 +76,7 @@ public class TrainingSessionController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<Page<TrainingSessionGetResponse>> findAll(@PageableDefault(sort = "startedAt", direction = Sort.Direction.DESC)
+    public ResponseEntity<Page<TrainingSessionGetResponse>> findAll(@ParameterObject @PageableDefault(sort = "startedAt", direction = Sort.Direction.DESC)
                                                                     Pageable pageable,
                                                                     @AuthenticationPrincipal User user) {
         var trainingSessionsPage = service.findAll(pageable, user);

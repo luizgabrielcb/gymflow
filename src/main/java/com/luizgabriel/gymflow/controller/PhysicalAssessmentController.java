@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -55,8 +56,8 @@ public class PhysicalAssessmentController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<Page<PhysicalAssessmentGetResponse>> findByAuthenticatedUser(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-                                                                                       Pageable pageable,
+    public ResponseEntity<Page<PhysicalAssessmentGetResponse>> findByAuthenticatedUser(@ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                                           Pageable pageable,
                                                                                        @AuthenticationPrincipal User user) {
         var physicalAssessmentsPage = service.findByAuthenticatedUser(pageable, user);
 
@@ -90,7 +91,7 @@ public class PhysicalAssessmentController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("user/{id}")
-    public ResponseEntity<Page<PhysicalAssessmentGetResponse>> findUserAssessmentByUserId(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+    public ResponseEntity<Page<PhysicalAssessmentGetResponse>> findUserAssessmentByUserId(@ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                                                           Pageable pageable,
                                                                                           @PathVariable Long id) {
         var physicalAssessmentsPage = service.findUserAssessmentByUserId(pageable, id);

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,7 +37,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     @GetMapping
-    public ResponseEntity<Page<UserGetResponse>> findAllUsers(@PageableDefault(sort = "name", direction = Sort.Direction.ASC)
+    public ResponseEntity<Page<UserGetResponse>> findAllUsers(@ParameterObject @PageableDefault(sort = "name", direction = Sort.Direction.ASC)
                                                               Pageable pageable) {
         var usersPage = service.findAll(pageable);
 

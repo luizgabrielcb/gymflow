@@ -3,9 +3,9 @@ spring:
     name: gymflow
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/gymflow
-    username: ${ENV_POSTGRES_USER}
-    password: ${ENV_POSTGRES_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
@@ -18,8 +18,6 @@ spring:
 
 server:
   port: 8080
-  servlet:
-    context-path: /gymflow
 
 logging:
   level:

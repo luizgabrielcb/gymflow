@@ -2,6 +2,7 @@ package com.luizgabriel.gymflow.controller;
 
 import com.luizgabriel.gymflow.domain.User;
 import com.luizgabriel.gymflow.dto.request.SessionSetPostRequest;
+import com.luizgabriel.gymflow.dto.request.SessionSetPutRequest;
 import com.luizgabriel.gymflow.dto.response.SessionSetIdPostResponse;
 import com.luizgabriel.gymflow.dto.response.TrainingSessionGetResponse;
 import com.luizgabriel.gymflow.dto.response.TrainingSessionIdPostResponse;
@@ -141,6 +142,39 @@ public class TrainingSessionController {
     @PatchMapping("{id}/cancel")
     public ResponseEntity<Void> cancelTrainingSession(@PathVariable Long id, @AuthenticationPrincipal User user) {
         service.cancelTrainingSession(id, user);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Update a set in a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Set updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress or invalid data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Session or set not found")
+    })
+    @PutMapping("{id}/sets/{setId}")
+    public ResponseEntity<Void> updateSet(@PathVariable Long id,
+                                          @PathVariable Long setId,
+                                          @Valid @RequestBody SessionSetPutRequest request,
+                                          @AuthenticationPrincipal User user) {
+        service.updateSet(id, setId, request, user);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Delete a set from a training session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Set deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Session not in progress"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Session does not belong to authenticated user"),
+            @ApiResponse(responseCode = "404", description = "Session or set not found")
+    })
+    @DeleteMapping("{id}/sets/{setId}")
+    public ResponseEntity<Void> deleteSet(@PathVariable Long id, @PathVariable Long setId, @AuthenticationPrincipal User user) {
+        service.deleteSet(id, setId, user);
 
         return ResponseEntity.noContent().build();
     }

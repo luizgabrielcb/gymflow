@@ -2,6 +2,7 @@ package com.luizgabriel.gymflow.service;
 
 import com.luizgabriel.gymflow.domain.*;
 import com.luizgabriel.gymflow.dto.request.SessionSetPostRequest;
+import com.luizgabriel.gymflow.dto.request.SessionSetPutRequest;
 import com.luizgabriel.gymflow.exception.BadRequestException;
 import com.luizgabriel.gymflow.exception.ForbiddenException;
 import com.luizgabriel.gymflow.exception.NotFoundException;
@@ -96,6 +97,34 @@ public class TrainingSessionService {
         trainingSessionRepository.save(trainingSession);
     }
 
+    public void updateSet(Long trainingSessionId, Long setId, SessionSetPutRequest request, User user) {
+        var trainingSession = findTrainingSessionOrThrowNotFound(trainingSessionId);
+
+        validateTrainingSessionOwnership(trainingSession, user);
+
+        validateTrainingSessionInProgress(trainingSession);
+
+        var sessionSet = findSessionSetOrThrowNotFound(setId);
+
+        sessionSet.setRepsNumber(request.repsNumber());
+        sessionSet.setWeightKg(request.weightKg());
+        sessionSet.setRestSeconds(request.restSeconds());
+
+        sessionSetRepository.save(sessionSet);
+    }
+
+    public void deleteSet(Long trainingSessionId, Long setId, User user) {
+        var trainingSession = findTrainingSessionOrThrowNotFound(trainingSessionId);
+
+        validateTrainingSessionOwnership(trainingSession, user);
+
+        validateTrainingSessionInProgress(trainingSession);
+
+        var sessionSet = findSessionSetOrThrowNotFound(setId);
+
+        sessionSetRepository.delete(sessionSet);
+    }
+
     public Page<TrainingSession> findAll(Pageable pageable, User user) {
         return trainingSessionRepository.findAllByUserId(pageable, user.getId());
     }
@@ -126,6 +155,11 @@ public class TrainingSessionService {
     private WorkoutExercise findWorkoutExerciseOrThrow(Long exerciseId, Long workoutId) {
         return workoutExerciseRepository.findByExerciseIdAndWorkoutId(exerciseId, workoutId)
                 .orElseThrow(() -> new BadRequestException("Exercise with id " + exerciseId + " is not part of this workout"));
+    }
+
+    private SessionSet findSessionSetOrThrowNotFound(Long setId) {
+        return sessionSetRepository.findById(setId)
+                .orElseThrow(() -> new NotFoundException("Session set with id " + setId + " not found"));
     }
 
     private void validateNoActiveSession(User user) {

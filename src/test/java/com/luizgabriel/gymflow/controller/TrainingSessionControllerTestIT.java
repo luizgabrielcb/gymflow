@@ -4,10 +4,7 @@ import com.luizgabriel.gymflow.commons.FileUtils;
 import com.luizgabriel.gymflow.config.AuthenticatedIntegrationConfig;
 import com.luizgabriel.gymflow.domain.Status;
 import com.luizgabriel.gymflow.exception.NotFoundException;
-import com.luizgabriel.gymflow.repository.ExerciseRepository;
-import com.luizgabriel.gymflow.repository.TrainingSessionRepository;
-import com.luizgabriel.gymflow.repository.UserRepository;
-import com.luizgabriel.gymflow.repository.WorkoutRepository;
+import com.luizgabriel.gymflow.repository.*;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
@@ -35,6 +32,9 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
 
     @Autowired
     private TrainingSessionRepository trainingSessionRepository;
+
+    @Autowired
+    private SessionSetRepository sessionSetRepository;
 
     @Autowired
     private UserRepository userRepository;

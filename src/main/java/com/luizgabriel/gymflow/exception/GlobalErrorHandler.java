@@ -99,7 +99,7 @@ public class GlobalErrorHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<DefaultErrorMessage> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         var defaultErrorMessage = DefaultErrorMessage.builder()
-                .message("Data integrity violation. Check the submitted data.")
+                .message("Cannot delete this resource because it is being used by other records")
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
 

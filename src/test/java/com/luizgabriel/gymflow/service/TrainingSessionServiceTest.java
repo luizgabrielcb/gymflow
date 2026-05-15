@@ -461,4 +461,167 @@ class TrainingSessionServiceTest {
         Assertions.assertThatThrownBy(() -> service.findById(trainingSession.getId(), anotherUser))
                 .isInstanceOf(ForbiddenException.class);
     }
+
+    @Test
+    @DisplayName("updateSet updates session set when successful")
+    void updateSet_UpdatesSessionSet_WhenSuccessful() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+        var sessionSet = utils.newSessionSet();
+        var request = utils.newSessionSetPutRequest();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        BDDMockito.when(sessionSetRepository.findById(sessionSet.getId()))
+                .thenReturn(Optional.of(sessionSet));
+
+        service.updateSet(trainingSession.getId(), sessionSet.getId(), request, trainingSession.getUser());
+
+        Assertions.assertThat(sessionSet.getRepsNumber()).isEqualTo(request.repsNumber());
+        Assertions.assertThat(sessionSet.getWeightKg()).isEqualByComparingTo(request.weightKg());
+        Assertions.assertThat(sessionSet.getRestSeconds()).isEqualTo(request.restSeconds());
+
+        BDDMockito.then(sessionSetRepository).should().save(sessionSet);
+    }
+
+    @Test
+    @DisplayName("updateSet throws NotFoundException when training session is not found")
+    void updateSet_ThrowsNotFoundException_WhenTrainingSessionIsNotFound() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+        var request = utils.newSessionSetPutRequest();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.updateSet(trainingSession.getId(), 1L, request, trainingSession.getUser()))
+                .isInstanceOf(NotFoundException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).save(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("updateSet throws ForbiddenException when training session does not belong to user")
+    void updateSet_ThrowsForbiddenException_WhenTrainingSessionDoesNotBelongToUser() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+        var anotherUser = User.builder().id(99L).build();
+        var request = utils.newSessionSetPutRequest();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        Assertions.assertThatThrownBy(() -> service.updateSet(trainingSession.getId(), 1L, request, anotherUser))
+                .isInstanceOf(ForbiddenException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).save(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("updateSet throws BadRequestException when training session is not in progress")
+    void updateSet_ThrowsBadRequestException_WhenTrainingSessionIsNotInProgress() {
+        var trainingSession = utils.newTrainingSession();
+        var request = utils.newSessionSetPutRequest();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        Assertions.assertThatThrownBy(() -> service.updateSet(trainingSession.getId(), 1L, request, trainingSession.getUser()))
+                .isInstanceOf(BadRequestException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).save(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("updateSet throws NotFoundException when session set is not found")
+    void updateSet_ThrowsNotFoundException_WhenSessionSetIsNotFound() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+        var request = utils.newSessionSetPutRequest();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        BDDMockito.when(sessionSetRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.updateSet(trainingSession.getId(), 1L, request, trainingSession.getUser()))
+                .isInstanceOf(NotFoundException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).save(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("deleteSet deletes session set when successful")
+    void deleteSet_DeletesSessionSet_WhenSuccessful() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+        var sessionSet = utils.newSessionSet();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        BDDMockito.when(sessionSetRepository.findById(sessionSet.getId()))
+                .thenReturn(Optional.of(sessionSet));
+
+        service.deleteSet(trainingSession.getId(), sessionSet.getId(), trainingSession.getUser());
+
+        BDDMockito.then(sessionSetRepository).should().delete(sessionSet);
+    }
+
+    @Test
+    @DisplayName("deleteSet throws NotFoundException when training session is not found")
+    void deleteSet_ThrowsNotFoundException_WhenTrainingSessionIsNotFound() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.deleteSet(trainingSession.getId(), 1L, trainingSession.getUser()))
+                .isInstanceOf(NotFoundException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).delete(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("deleteSet throws ForbiddenException when training session does not belong to user")
+    void deleteSet_ThrowsForbiddenException_WhenTrainingSessionDoesNotBelongToUser() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+        var anotherUser = User.builder().id(99L).build();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        Assertions.assertThatThrownBy(() -> service.deleteSet(trainingSession.getId(), 1L, anotherUser))
+                .isInstanceOf(ForbiddenException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).delete(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("deleteSet throws BadRequestException when training session is not in progress")
+    void deleteSet_ThrowsBadRequestException_WhenTrainingSessionIsNotInProgress() {
+        var trainingSession = utils.newTrainingSession();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        Assertions.assertThatThrownBy(() -> service.deleteSet(trainingSession.getId(), 1L, trainingSession.getUser()))
+                .isInstanceOf(BadRequestException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).delete(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("deleteSet throws NotFoundException when session set is not found")
+    void deleteSet_ThrowsNotFoundException_WhenSessionSetIsNotFound() {
+        var trainingSession = utils.newTrainingSessionInProgress();
+
+        BDDMockito.when(trainingSessionRepository.findById(trainingSession.getId()))
+                .thenReturn(Optional.of(trainingSession));
+
+        BDDMockito.when(sessionSetRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.deleteSet(trainingSession.getId(), 1L, trainingSession.getUser()))
+                .isInstanceOf(NotFoundException.class);
+
+        BDDMockito.then(sessionSetRepository).should(Mockito.never()).delete(ArgumentMatchers.any());
+    }
 }

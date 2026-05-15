@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 
+import java.math.BigDecimal;
+
 @Sql(value = "/sql/user/delete-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = "/sql/exercise/delete-exercises.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
@@ -855,6 +857,407 @@ class TrainingSessionControllerTestIT extends AuthenticatedIntegrationConfig {
                 .pathParam("id", 9999L)
                 .when()
                 .get(URL + "/{id}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 204 no content when successful")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void updateSet_ReturnsNoContent_WhenSuccessful() {
+        var token = loginAsUserToken();
+
+        var request = fileUtils.readResourceFile("training-session/put-request-session-set.json");
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .body(request)
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all();
+
+        var updatedSessionSet = sessionSetRepository.findById(sessionSet.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        Assertions.assertThat(updatedSessionSet.getRepsNumber()).isEqualTo(12);
+        Assertions.assertThat(updatedSessionSet.getWeightKg()).isEqualByComparingTo(new BigDecimal("60.0"));
+        Assertions.assertThat(updatedSessionSet.getRestSeconds()).isEqualTo(90);
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 400 bad request when fields are invalid")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void updateSet_ReturnsBadRequest_WhenFieldsAreInvalid() {
+        var token = loginAsUserToken();
+
+        var request = fileUtils.readResourceFile("training-session/put-request-session-set-invalid-fields.json");
+        var response = fileUtils.readResourceFile("training-session/put-response-session-set-invalid-fields-400.json");
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .body(request)
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 400 bad request when session is not in progress")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-completed-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set-completed.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void updateSet_ReturnsBadRequest_WhenSessionIsNotInProgress() {
+        var token = loginAsUserToken();
+
+        var request = fileUtils.readResourceFile("training-session/put-request-session-set.json");
+        var response = fileUtils.readResourceFile("training-session/put-response-session-set-400.json");
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.COMPLETED)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .body(request)
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 401 unauthorized when not authenticated")
+    void updateSet_ReturnsUnauthorized_WhenNotAuthenticated() {
+        var response = fileUtils.readResourceFile("training-session/put-response-session-set-401.json");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .pathParam("id", 9999L)
+                .pathParam("setId", 9999L)
+                .body("{\"repsNumber\": 12, \"weightKg\": 60.0, \"restSeconds\": 90}")
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 403 forbidden when not owner")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-another-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void updateSet_ReturnsForbidden_WhenNotOwner() {
+        var token = loginAsUserToken();
+
+        var request = fileUtils.readResourceFile("training-session/put-request-session-set.json");
+        var response = fileUtils.readResourceFile("training-session/put-response-session-set-403.json");
+
+        var anotherUser = userRepository.findByEmailIgnoreCase("test.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(anotherUser.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .body(request)
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 404 not found when training session not found")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void updateSet_ReturnsNotFound_WhenTrainingSessionNotFound() {
+        var token = loginAsUserToken();
+
+        var request = fileUtils.readResourceFile("training-session/put-request-session-set.json");
+        var response = fileUtils.readResourceFile("training-session/put-response-session-set-training-session-404.json");
+
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", 9999L)
+                .pathParam("setId", 9999L)
+                .body(request)
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("PUT v1/training-sessions/{id}/sets/{setId} returns 404 not found when session set not found")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void updateSet_ReturnsNotFound_WhenSessionSetNotFound() {
+        var token = loginAsUserToken();
+
+        var request = fileUtils.readResourceFile("training-session/put-request-session-set.json");
+        var response = fileUtils.readResourceFile("training-session/put-response-session-set-404.json");
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", 9999L)
+                .body(request)
+                .when()
+                .put(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("DELETE v1/training-sessions/{id}/sets/{setId} returns 204 no content when successful")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void deleteSet_ReturnsNoContent_WhenSuccessful() {
+        var token = loginAsUserToken();
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .when()
+                .delete(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all();
+
+        var deletedSessionSet = sessionSetRepository.findById(sessionSet.getId());
+
+        Assertions.assertThat(deletedSessionSet).isEmpty();
+    }
+
+    @Test
+    @DisplayName("DELETE v1/training-sessions/{id}/sets/{setId} returns 400 bad request when training session is not in progress")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-completed-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set-completed.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void deleteSet_ReturnsBadRequest_WhenTrainingSessionIsNotInProgress() {
+        var token = loginAsUserToken();
+
+        var response = fileUtils.readResourceFile("training-session/delete-response-training-session-400.json");
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.COMPLETED)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .when()
+                .delete(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("DELETE v1/training-sessions/{id}/sets/{setId} returns 401 unauthorized when not authenticated")
+    void deleteSet_ReturnsUnauthorized_WhenNotAuthenticated() {
+        var response = fileUtils.readResourceFile("training-session/delete-response-session-set-401.json");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .pathParam("id", 9999L)
+                .pathParam("setId", 9999L)
+                .when()
+                .delete(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("DELETE v1/training-sessions/{id}/sets/{setId} returns 403 forbidden when not owner")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/user/insert-another-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/exercise/insert-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-workout-exercise-bench-press.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-session-set-for-another-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void deleteSet_ReturnsForbidden_WhenNotOwner() {
+        var token = loginAsUserToken();
+
+        var response = fileUtils.readResourceFile("training-session/delete-response-session-set-403.json");
+
+        var anotherUser = userRepository.findByEmailIgnoreCase("test.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(anotherUser.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        var sessionSet = sessionSetRepository.findFirstByTrainingSessionId(trainingSession.getId())
+                .orElseThrow(() -> new NotFoundException("Session set not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", sessionSet.getId())
+                .when()
+                .delete(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("DELETE v1/training-sessions/{id}/sets/{setId} returns 404 not found when training session not found")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void deleteSet_ReturnsNotFound_WhenTrainingSessionNotFound() {
+        var token = loginAsUserToken();
+
+        var response = fileUtils.readResourceFile("training-session/delete-response-session-set-training-session-404.json");
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", 9999L)
+                .pathParam("setId", 9999L)
+                .when()
+                .delete(URL + "/{id}/sets/{setId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .body(Matchers.equalTo(response))
+                .log().all();
+    }
+
+    @Test
+    @DisplayName("DELETE v1/training-sessions/{id}/sets/{setId} returns 404 not found when session set not found")
+    @Sql(value = "/sql/user/insert-regular-user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/workout/insert-one-workout.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "/sql/training-session/insert-one-in-progress-training-session.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void deleteSet_ReturnsNotFound_WhenSessionSetNotFound() {
+        var token = loginAsUserToken();
+
+        var response = fileUtils.readResourceFile("training-session/delete-response-session-set-404.json");
+
+        var user = userRepository.findByEmailIgnoreCase("user.test@gmail.com")
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        var trainingSession = trainingSessionRepository.findByUserIdAndStatus(user.getId(), Status.IN_PROGRESS)
+                .orElseThrow(() -> new NotFoundException("Training session not found"));
+
+        RestAssured.given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .pathParam("id", trainingSession.getId())
+                .pathParam("setId", 9999L)
+                .when()
+                .delete(URL + "/{id}/sets/{setId}")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body(Matchers.equalTo(response))

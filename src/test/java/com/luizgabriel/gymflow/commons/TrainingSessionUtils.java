@@ -2,6 +2,7 @@ package com.luizgabriel.gymflow.commons;
 
 import com.luizgabriel.gymflow.domain.*;
 import com.luizgabriel.gymflow.dto.request.SessionSetPostRequest;
+import com.luizgabriel.gymflow.dto.request.SessionSetPutRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -71,6 +72,14 @@ public class TrainingSessionUtils {
                 .repsNumber(sessionSet.getRepsNumber())
                 .weightKg(sessionSet.getWeightKg())
                 .restSeconds(sessionSet.getRestSeconds())
+                .build();
+    }
+
+    public SessionSetPutRequest newSessionSetPutRequest() {
+        return SessionSetPutRequest.builder()
+                .repsNumber(15)
+                .weightKg(BigDecimal.valueOf(70))
+                .restSeconds(120)
                 .build();
     }
 }

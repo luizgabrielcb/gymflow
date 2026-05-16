@@ -211,13 +211,7 @@ git clone https://github.com/luizgabrielcb/gymflow.git
 cd gymflow
 ```
 
-### 2. Start the database
-
-```bash
-docker-compose up -d
-```
-
-### 3. Configure environment variables
+### 2. Configure environment variables
 
 Copy the `.envTemplate` file and rename it to `.env`:
 
@@ -240,6 +234,12 @@ SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${POSTGRES_DB}
 SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
 SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
 ENV_JWT_SECRET=your_secret
+```
+
+### 3. Start the database
+
+```bash
+docker-compose up -d
 ```
 
 ### 4. Run the application

@@ -5,7 +5,7 @@
 RESTful API for managing workouts, training sessions, and physical assessments. Built with Spring Boot 3.5, Spring
 Security with JWT authentication, and full integration test coverage.
 
-🔗 **[Swagger UI](https://gymflow-api-t7h9.onrender.com/gymflow/v1/swagger-ui/index.html)** | 📦 *
+🔗 **[Swagger UI](https://gymflow-api-t7h9.onrender.com/swagger-ui/index.html)** | 📦 *
 *[Repository](https://github.com/luizgabrielcb/gymflow)**
 
 ## ⚙️ CI

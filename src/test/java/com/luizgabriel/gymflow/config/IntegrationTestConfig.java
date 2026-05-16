@@ -30,7 +30,7 @@ public abstract class IntegrationTestConfig {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        RestAssured.basePath = "/gymflow/v1";
+        RestAssured.basePath = "/v1";
     }
 
     @DynamicPropertySource

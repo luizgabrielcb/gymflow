@@ -1,6 +1,6 @@
 # 💪 GymFlow API
 
-![CI](https://github.com/luizgabrielcb/gymflow/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/luizgabrielcb/gymflow/actions/workflows/workflow.yml/badge.svg)
 
 RESTful API for managing workouts, training sessions, and physical assessments. Built with Spring Boot 3.5, Spring
 Security with JWT authentication, and full integration test coverage.

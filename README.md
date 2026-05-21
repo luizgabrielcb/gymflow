@@ -2,65 +2,67 @@
 
 ![CI](https://github.com/luizgabrielcb/gymflow/actions/workflows/workflow.yml/badge.svg)
 
-RESTful API for managing workouts, training sessions, and physical assessments. Built with Spring Boot 3.5, Spring
-Security with JWT authentication, and full integration test coverage.
+RESTful API for managing workouts, training sessions, and physical assessments. Built with Spring Boot 3.5, Spring Security with JWT authentication, and a two-layer test strategy with full controller coverage.
 
-🔗 **[Swagger UI](https://gymflow-api-t7h9.onrender.com/swagger-ui/index.html)** | 📦 *
-*[Repository](https://github.com/luizgabrielcb/gymflow)**
+🔗 **[Swagger UI](https://gymflow-api-t7h9.onrender.com/swagger-ui/index.html)** | 📦 **[Repository](https://github.com/luizgabrielcb/gymflow)**
 
-## ⚙️ CI
+---
 
-The project uses **GitHub Actions** to automatically run tests on every push or pull request to the `main` branch.
+## 📖 About
 
-The pipeline runs:
+A portfolio project built to demonstrate production-ready patterns in a Spring Boot back-end: JWT with rotating refresh tokens, role-based access control, a two-layer testing strategy with real PostgreSQL via Testcontainers, and CI/CD with automatic deploy. Built as part of my journey into back-end development.
 
-1. Project build
-2. Unit and integration tests with Testcontainers
+## ✨ Highlights
 
-## ☁️ Deploy
-
-The API is hosted on **Render** with automatic redeploy on every merge to `main`.
-
-- **Base URL:** `https://gymflow-api-t7h9.onrender.com/gymflow/v1`
-
-> ⚠️ The service may take a few seconds to respond on the first request since Render puts free-tier instances to sleep
-> after inactivity.
+- **222 tests** running in ~10s — integration tests at the controller layer and unit tests at the service layer
+- **100% controller coverage** with integration tests using Testcontainers (real PostgreSQL) and REST Assured
+- **Service layer** tested with JUnit 5 + Mockito (99% line coverage)
+- **88% overall line coverage**, 96% class coverage
+- **Rotating refresh token** strategy with revocation tracking
+- **Custom exception handling** with proper HTTP status mapping (400, 403, 404, 409)
+- **Multi-stage Dockerfile** and automated deploy pipeline
 
 ---
 
 ## 🛠️ Stack
 
-| Technology            | Version     |
-|-----------------------|-------------|
-| Java                  | 21          |
-| Spring Boot           | 3.5         |
-| Spring Security + JWT | auth0 4.5.2 |
-| PostgreSQL            | 17          |
-| Flyway                | -           |
-| MapStruct             | -           |
-| SpringDoc/Swagger UI  | -           |
-| Bean Validation       | -           |
-| Docker                | -           |
+| Technology            | Version |
+|-----------------------|---------|
+| Java                  | 21      |
+| Spring Boot           | 3.5     |
+| Spring Security + JWT | -       |
+| PostgreSQL            | 17      |
+| Flyway                | -       |
+| MapStruct             | -       |
+| SpringDoc/Swagger UI  | -       |
+| Bean Validation       | -       |
+| Docker                | -       |
 
 ### Testing
 
 | Technology     | Usage                                      |
 |----------------|--------------------------------------------|
-| JUnit 5        | Unit tests                                 |
-| Mockito        | Mocking                                    |
+| JUnit 5        | Unit and integration test framework        |
+| Mockito        | Service-layer mocking                      |
 | Testcontainers | PostgreSQL container for integration tests |
 | REST Assured   | HTTP integration tests                     |
 
 ---
 
-## 🔐 Authentication
+## 🏗️ Project Structure
 
-The API uses **JWT** with a **rotating refresh token** strategy:
-
-- `POST /auth/register` — User registration
-- `POST /auth/login` — Login, returns `accessToken` (2h) + `refreshToken` (7 days)
-- `POST /auth/refresh` — Generates a new token pair and revokes the previous refresh token
-- `POST /auth/logout` — Revokes the refresh token
+```
+com.luizgabriel.gymflow
+ ├── config/      — OpenAPI/Swagger configuration
+ ├── controller/  — REST endpoints
+ ├── domain/      — JPA entities
+ ├── dto/         — Request and response DTOs
+ ├── exception/   — Custom exceptions and global handler
+ ├── mapper/      — MapStruct mappers (entity ↔ DTO)
+ ├── repository/  — Spring Data JPA repositories
+ ├── security/    — Spring Security configuration, JWT filter, and token service
+ └── service/     — Business logic
+```
 
 ---
 
@@ -77,16 +79,14 @@ User
 
 ---
 
-## 🧑‍💻 Test Credentials
+## 🔐 Authentication
 
-The API has pre-registered users available for testing in the production environment:
+The API uses **JWT** with a **rotating refresh token** strategy:
 
-| Role  | Email                  | Password |
-|-------|------------------------|----------|
-| ADMIN | `admin.test@gmail.com` | `test`   |
-| USER  | `user.test@gmail.com`  | `test`   |
-
-Use the `POST /auth/login` endpoint with these credentials to get a token and test the endpoints in Swagger.
+- `POST /auth/register` — User registration
+- `POST /auth/login` — Login, returns `accessToken` (2h) + `refreshToken` (7 days)
+- `POST /auth/refresh` — Generates a new token pair and revokes the previous refresh token
+- `POST /auth/logout` — Revokes the refresh token
 
 ---
 
@@ -197,6 +197,69 @@ Use the `POST /auth/login` endpoint with these credentials to get a token and te
 
 ---
 
+## 🧪 Testing
+
+The project follows a **two-layer testing strategy**:
+
+- **Integration tests (controllers)** — hit real HTTP endpoints against a live PostgreSQL container managed by Testcontainers, using REST Assured. Test classes share a singleton container instance for fast execution.
+- **Unit tests (services)** — isolate business logic with Mockito, mocking repositories and other dependencies.
+
+### Coverage
+
+| Layer         | Class | Method | Line | Branch |
+|---------------|-------|--------|------|--------|
+| `controller`  | 100%  | 100%   | 100% | 100%   |
+| `service`     | 100%  | 100%   | 99%  | 100%   |
+| `security`    | 100%  | 100%   | 96%  | 83%    |
+| `config`      | 100%  | 100%   | 100% | 100%   |
+| `domain`      | 100%  | 100%   | 100% | 100%   |
+| **Overall**   | 96%   | 94%    | 88%  | 65%    |
+
+### Running tests
+
+```bash
+# Run all tests (unit + integration)
+./mvnw clean verify
+```
+
+Integration tests use **Testcontainers** — Docker must be running.
+
+---
+
+## 🧑‍💻 Test Credentials
+
+The API has pre-registered users available for testing in the production environment:
+
+| Role  | Email                  | Password |
+|-------|------------------------|----------|
+| ADMIN | `admin.test@gmail.com` | `test`   |
+| USER  | `user.test@gmail.com`  | `test`   |
+
+Use the `POST /auth/login` endpoint with these credentials to get a token and test the endpoints in Swagger.
+
+---
+
+## ⚙️ CI/CD
+
+The project uses **GitHub Actions** for CI and **Render** for continuous deployment.
+
+The CI pipeline runs on every push and PR to `main`:
+
+1. Sets up JDK 21 with Maven dependency cache
+2. Executes `./mvnw clean verify` (unit + integration tests)
+3. Integration tests spin up a real PostgreSQL container via Testcontainers
+4. On success against `main`, Render auto-deploys the new build
+
+### Deploy
+
+The API is hosted on **Render** with automatic redeploy on every merge to `main`.
+
+- **Base URL:** `https://gymflow-api-t7h9.onrender.com/gymflow/v1`
+
+> 💡 Free-tier note: the first request after inactivity may take ~30s while Render wakes the instance.
+
+---
+
 ## 🚀 Running locally
 
 ### Prerequisites
@@ -251,16 +314,3 @@ Execute the main class `GymflowApplication` from your IDE.
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
-
----
-
-## 🧪 Tests
-
-```bash
-# Run all tests (unit + integration)
-./mvnw clean verify
-```
-
-Integration tests use **Testcontainers** — Docker must be running.
-
----
